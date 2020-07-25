@@ -15,11 +15,11 @@ import java.math.BigDecimal;
 public class TransactionDTO {
     String id;
 
-    @NotBlank(message = "can't be empty") String userId;
+    String userId;
     String subscriptionId;
-    @NotBlank(message = "can't be empty") BigDecimal amount;
+    BigDecimal amount;
     String description;
-    @NotBlank(message = "can't be empty") String categoryId;
+    String categoryId;
 
     Long transactionDate;
     Long dateCreated;

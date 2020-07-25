@@ -45,7 +45,10 @@ public class CategoryController {
 
     @PutMapping(path = "{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO changes) {
-        Category category = new Category();
+
+
+
+        Category category = categoryRepository.findOne(id);
         category.setId(id);
         category.setUserId(changes.getUserId());
         category.setSortOrder(changes.getSortOrder());

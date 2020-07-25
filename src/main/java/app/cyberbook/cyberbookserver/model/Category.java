@@ -1,6 +1,7 @@
 package app.cyberbook.cyberbookserver.model;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 @Entity
+@DynamicUpdate
 @Getter
 @Setter
 @NoArgsConstructor
