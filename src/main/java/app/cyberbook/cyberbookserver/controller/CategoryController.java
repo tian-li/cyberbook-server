@@ -4,6 +4,7 @@ import app.cyberbook.cyberbookserver.model.Category;
 import app.cyberbook.cyberbookserver.model.CategoryDTO;
 import app.cyberbook.cyberbookserver.model.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,12 +44,19 @@ public class CategoryController {
         return ResponseEntity.ok(categoryRepository.save(category));
     }
 
-    @PutMapping(path = "{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO changes) {
+    @PatchMapping(path = "{id}")
+    public ResponseEntity updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO changes) {
 
+//Category c = new Category();
 
+        Category category = categoryRepository.findById(id).orElse(null);
 
-        Category category = categoryRepository.findOne(id);
+        System.out.println("find put" + category);
+
+        if (category == null) {
+            return new ResponseEntity("没有此记录", HttpStatus.BAD_REQUEST);
+        }
+
         category.setId(id);
         category.setUserId(changes.getUserId());
         category.setSortOrder(changes.getSortOrder());
@@ -57,7 +65,8 @@ public class CategoryController {
         category.setColor(changes.getColor());
         category.setIsSpend(changes.getIsSpend());
         category.setAddedByUser(changes.getAddedByUser());
-        return ResponseEntity.ok(categoryRepository.save(category));
+        return new ResponseEntity(categoryRepository.save(category), HttpStatus.OK);
+//        return new ResponseEntity(HttpStatus.OK);
     }
 
     @DeleteMapping(path = "{id}")
