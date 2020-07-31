@@ -22,8 +22,8 @@ public class CategoryController {
     @ResponseBody
     public ResponseEntity<List<Category>> getCategories(@RequestParam(name = "userId") String userId) {
         List<Category> categoryList = categoryRepository.findAllByUserId(userId);
-        categoryList.forEach(c -> System.out.println("find by user id" + c));
-        return ResponseEntity.ok(categoryList);
+//        categoryList.forEach(c -> System.out.println("find by user id" + c));
+        return ResponseEntity.ok(categoryRepository.findAllByUserId(userId));
     }
 
     @GetMapping(path = "{id}")
@@ -33,6 +33,7 @@ public class CategoryController {
 
     @PostMapping()
     public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryDTO value) {
+
         Category category = new Category();
         category.setUserId(value.getUserId());
         category.setSortOrder(value.getSortOrder());
@@ -44,29 +45,20 @@ public class CategoryController {
         return ResponseEntity.ok(categoryRepository.save(category));
     }
 
-    @PatchMapping(path = "{id}")
-    public ResponseEntity updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO changes) {
-
-//Category c = new Category();
-
+    @PutMapping(path = "{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO value) {
         Category category = categoryRepository.findById(id).orElse(null);
-
-        System.out.println("find put" + category);
-
         if (category == null) {
             return new ResponseEntity("没有此记录", HttpStatus.BAD_REQUEST);
         }
 
-        category.setId(id);
-        category.setUserId(changes.getUserId());
-        category.setSortOrder(changes.getSortOrder());
-        category.setName(changes.getName());
-        category.setIcon(changes.getIcon());
-        category.setColor(changes.getColor());
-        category.setIsSpend(changes.getIsSpend());
-        category.setAddedByUser(changes.getAddedByUser());
-        return new ResponseEntity(categoryRepository.save(category), HttpStatus.OK);
-//        return new ResponseEntity(HttpStatus.OK);
+        category.setSortOrder(value.getSortOrder());
+        category.setName(value.getName());
+        category.setIcon(value.getIcon());
+        category.setColor(value.getColor());
+        category.setIsSpend(value.getIsSpend());
+        category.setAddedByUser(value.getAddedByUser());
+        return ResponseEntity.ok(categoryRepository.save(category));
     }
 
     @DeleteMapping(path = "{id}")
