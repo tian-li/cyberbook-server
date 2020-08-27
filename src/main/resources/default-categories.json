@@ -1,0 +1,82 @@
+[
+  {
+    "name": "超市",
+    "icon": "storefront",
+    "color": "#f76464",
+    "isSpend": true,
+    "sortOrder": 0,
+    "addedByUser":false
+  },
+  {
+    "name": "餐饮",
+    "icon": "restaurant",
+    "color": "#5DA5DA",
+    "isSpend": true,
+    "sortOrder": 1,
+    "addedByUser": false
+  },
+  {
+    "name": "交通",
+    "icon": "commute",
+    "color": "#FAA43A",
+    "isSpend": true,
+    "sortOrder": 2,
+    "addedByUser": false
+  },
+  {
+    "name": "娱乐",
+    "icon": "live_tv",
+    "color": "#60BD68",
+    "isSpend": true,
+    "sortOrder": 3,
+    "addedByUser": false
+  },
+  {
+    "name": "住房",
+    "icon": "house",
+    "color": "#F17CB0",
+    "isSpend": true,
+    "sortOrder": 4,
+    "addedByUser": false
+  },
+  {
+    "name": "宠物",
+    "icon": "pets",
+    "color": "#B2912F",
+    "isSpend": true,
+    "sortOrder": 5,
+    "addedByUser": false
+  },
+  {
+    "name": "学习",
+    "icon": "school",
+    "color": "#B276B2",
+    "isSpend": true,
+    "sortOrder": 6,
+    "addedByUser": false
+  },
+  {
+    "name": "其他",
+    "icon": "category",
+    "color": "#DECF3F",
+    "isSpend": true,
+    "sortOrder": 7,
+    "addedByUser": false
+  },
+  {
+    "name": "投资",
+    "icon": "account_balance_wallet",
+    "color": "#f76464",
+    "isSpend": false,
+    "sortOrder": 0,
+    "addedByUser": false
+  },
+  {
+    "name": "工资",
+    "icon": "local_atm",
+    "color": "#5DA5DA",
+    "isSpend": false,
+    "sortOrder": 1,
+    "addedByUser": false
+  }
+]

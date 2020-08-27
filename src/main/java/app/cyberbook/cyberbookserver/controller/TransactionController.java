@@ -1,12 +1,14 @@
 package app.cyberbook.cyberbookserver.controller;
 
 import app.cyberbook.cyberbookserver.model.*;
+import app.cyberbook.cyberbookserver.service.UserService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -20,33 +22,42 @@ public class TransactionController {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping()
-    @ResponseBody
-    public ResponseEntity<List<Transaction>> getCategories(@RequestParam(name = "userId") String userId) {
-        List<Transaction> transactionList = transactionRepository.findAllByUserId(userId);
-        transactionList.forEach(c -> System.out.println("find by user id" + c));
+    public ResponseEntity<List<Transaction>> getTransactions(HttpServletRequest req) {
+        User user = userService.getUserByHttpRequestToken(req);
+        List<Transaction> transactionList = transactionRepository.findAllByUserId(user.getId());
+//        transactionList.forEach(c -> System.out.println("find by user id" + c));
         return ResponseEntity.ok(transactionList);
     }
 
     @GetMapping(path = "{id}")
-    public ResponseEntity<Optional<Transaction>> getTransactionById(@PathVariable("id") String id) {
-        return ResponseEntity.ok(transactionRepository.findById(id));
+    public ResponseEntity<Transaction> getTransactionById(@PathVariable("id") String id, HttpServletRequest req) {
+        User user = userService.getUserByHttpRequestToken(req);
+        Optional<Transaction> transaction = transactionRepository.findById(id);
+
+        if (transaction.isPresent() && user.getId().equals(transaction.get().getUserId())) {
+            return ResponseEntity.ok(transaction.get());
+        } else {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
     }
 
     @PostMapping()
-    public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody TransactionDTO value) {
-        System.out.println("value"+value.toString());
+    public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody TransactionDTO value, HttpServletRequest req) {
+        User user = userService.getUserByHttpRequestToken(req);
+
         String categoryId = value.getCategoryId();
 
-        System.out.println("categoryId"+categoryId);
-
-        if(categoryId == null || !isCategoryPresent(categoryId)) {
+        if (categoryId == null || !isCategoryPresent(categoryId)) {
             return new ResponseEntity("Category not exist", HttpStatus.BAD_REQUEST);
         }
 
         Transaction transaction = new Transaction();
 
-        transaction.setUserId(value.getUserId());
+        transaction.setUserId(user.getId());
         transaction.setAmount(value.getAmount());
         transaction.setDescription(value.getDescription());
         transaction.setCategoryId(categoryId);
@@ -60,37 +71,45 @@ public class TransactionController {
     }
 
     @PutMapping(path = "{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable("id") String id, @RequestBody TransactionDTO changes) {
-        String categoryId = changes.getCategoryId();
-        if(categoryId == null || !isCategoryPresent(categoryId)) {
-            return new ResponseEntity("Category not exist", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Transaction> updateTransaction(@PathVariable("id") String id, @RequestBody TransactionDTO changes, HttpServletRequest req) {
+        User user = userService.getUserByHttpRequestToken(req);
+        Optional<Transaction> findResult = transactionRepository.findById(id);
+
+        if (findResult.isPresent() && user.getId().equals(findResult.get().getUserId())) {
+            String categoryId = changes.getCategoryId();
+
+            if (categoryId == null || !isCategoryPresent(categoryId)) {
+                return new ResponseEntity("Category not exist", HttpStatus.BAD_REQUEST);
+            }
+
+            Transaction transaction = findResult.get();
+            transaction.setId(id);
+            transaction.setAmount(changes.getAmount());
+            transaction.setDescription(changes.getDescription());
+            transaction.setCategoryId(categoryId);
+            transaction.setSubscriptionId(changes.getSubscriptionId());
+            transaction.setDateModified(DateTime.now().getMillis());
+            return ResponseEntity.ok(transactionRepository.save(transaction));
+        } else {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
-        // TODO check subscription
-
-
-        Transaction transaction = new Transaction();
-        transaction.setId(id);
-        transaction.setUserId(changes.getUserId());
-        transaction.setAmount(changes.getAmount());
-        transaction.setDescription(changes.getDescription());
-        transaction.setCategoryId(categoryId);
-        transaction.setSubscriptionId(changes.getSubscriptionId());
-        transaction.setDateModified(DateTime.now().getMillis());
-        return ResponseEntity.ok(transactionRepository.save(transaction));
     }
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity.BodyBuilder deleteTransactionById(@PathVariable("id") String id) {
-        try {
-            transactionRepository.deleteById(id);
-            return ResponseEntity.ok();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest();
+    public ResponseEntity deleteTransactionById(@PathVariable("id") String id, HttpServletRequest req) {
+        User user = userService.getUserByHttpRequestToken(req);
+        Optional<Transaction> transaction = transactionRepository.findById(id);
+
+        if (transaction.isPresent() && user.getId().equals(transaction.get().getUserId())) {
+            categoryRepository.deleteById(id);
+            return ResponseEntity.ok(id);
+        } else {
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
     }
 
     private Boolean isCategoryPresent(String categoryId) {
-        Optional<Category> category =  categoryRepository.findById(categoryId);
+        Optional<Category> category = categoryRepository.findById(categoryId);
 
         return category.isPresent();
     }

@@ -2,75 +2,48 @@ package app.cyberbook.cyberbookserver.controller;
 
 import app.cyberbook.cyberbookserver.model.Category;
 import app.cyberbook.cyberbookserver.model.CategoryDTO;
-import app.cyberbook.cyberbookserver.model.CategoryRepository;
+import app.cyberbook.cyberbookserver.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/categories")
 public class CategoryController {
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     @GetMapping()
-    @ResponseBody
-    public ResponseEntity<List<Category>> getCategories(@RequestParam(name = "userId") String userId) {
-        List<Category> categoryList = categoryRepository.findAllByUserId(userId);
-//        categoryList.forEach(c -> System.out.println("find by user id" + c));
-        return ResponseEntity.ok(categoryRepository.findAllByUserId(userId));
+    public ResponseEntity<List<Category>> getCategories(HttpServletRequest req) {
+        return categoryService.getCategories(req);
     }
 
     @GetMapping(path = "{id}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable("id") String id) {
-        Optional<Category> category = categoryRepository.findById(id);
-
-        return category.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-
+    public ResponseEntity<Category> getCategoryById(@PathVariable("id") String id, HttpServletRequest req) {
+        return categoryService.getCategoryById(id, req);
     }
 
     @PostMapping()
-    public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryDTO value) {
-
-        Category category = new Category();
-        category.setUserId(value.getUserId());
-        category.setSortOrder(value.getSortOrder());
-        category.setName(value.getName());
-        category.setIcon(value.getIcon());
-        category.setColor(value.getColor());
-        category.setIsSpend(value.getIsSpend());
-        category.setAddedByUser(value.getAddedByUser());
-        return ResponseEntity.ok(categoryRepository.save(category));
+    public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryDTO categoryDTO, HttpServletRequest req) {
+        return categoryService.addCategory(categoryDTO, req);
     }
 
-    @PutMapping(path = "{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO value) {
-        Category category = categoryRepository.findById(id).orElse(null);
-        if (category == null) {
-            return new ResponseEntity("没有此记录", HttpStatus.BAD_REQUEST);
-        }
+//    @PostMapping()
+//    public ResponseEntity<List<Category>> createCategories(@Valid @RequestBody List<CategoryDTO> categoryDTOs, HttpServletRequest req) {
+//        return categoryService.addCategories(categoryDTOs, req);
+//    }
 
-        category.setSortOrder(value.getSortOrder());
-        category.setName(value.getName());
-        category.setIcon(value.getIcon());
-        category.setColor(value.getColor());
-        category.setIsSpend(value.getIsSpend());
-        category.setAddedByUser(value.getAddedByUser());
-        return ResponseEntity.ok(categoryRepository.save(category));
+    @PutMapping(path = "{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO value, HttpServletRequest req) {
+        return categoryService.updateCategory(id, value, req);
     }
 
     @DeleteMapping(path = "{id}")
-    public ResponseEntity.BodyBuilder deleteCategoryById(@PathVariable("id") String id) {
-        try {
-            categoryRepository.deleteById(id);
-            return ResponseEntity.ok();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest();
-        }
+    public ResponseEntity deleteCategoryById(@PathVariable("id") String id, HttpServletRequest req) {
+        return categoryService.deleteCategoryById(id, req);
     }
 }
