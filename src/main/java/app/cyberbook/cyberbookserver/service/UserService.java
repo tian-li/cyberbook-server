@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class UserService {
@@ -40,7 +39,9 @@ public class UserService {
 
     public ResponseEntity login(User value) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(value.getEmail(), value.getPassword()));
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(value.getEmail(), value.getPassword());
+
+            authenticationManager.authenticate(token);
             return ResponseEntity.ok(
                     jwtTokenProvider.createToken(
                             value.getEmail(),
@@ -69,24 +70,23 @@ public class UserService {
         userRepository.save(user);
 
         try {
-            CategoryDTO[] categoryDTOs = categoryService.generateDefaultCategoryDTOs();
-            System.out.println("categoryDTOs" + categoryDTOs);
+            List<CategoryDTO> categoryDTOs = categoryService.generateDefaultCategoryDTOs();
             categoryService.createCategories(categoryDTOs, user.getId());
         } catch (IOException e) {
             return new ResponseEntity("Error when creating default categories", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return ResponseEntity.ok(jwtTokenProvider.createToken(user.getUsername(), user.getRoles()));
+        return ResponseEntity.ok(jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
     }
 
-    public ResponseEntity register(User value) {
+    public ResponseEntity register(User value, HttpServletRequest req) {
         if (value == null || value.getEmail() == null || value.getPassword() == null) {
             return new ResponseEntity("Invalid register info", HttpStatus.BAD_REQUEST);
         }
-
         User user = new User();
+        User tokenUser = getUserByHttpRequestToken(req);
 
-        if (value.getId() == null) {
+        if (tokenUser == null) {
             user.setBirthday(null);
             user.setEmail(value.getEmail());
             user.setPassword(value.getPassword());
@@ -95,15 +95,11 @@ public class UserService {
             user.setRegistered(true);
             user.setDateRegistered(DateTime.now().getMillis());
         } else {
-            Optional<User> existingUser = userRepository.findById(value.getId());
-
-            if (existingUser.isPresent()) {
-                // If this is an existing temp user
-                user = existingUser.get();
-                user.setEmail(value.getEmail());
-                user.setPassword(value.getPassword());
-                user.setRegistered(true);
-            }
+            // If this is an existing temp user
+            user = tokenUser;
+            user.setEmail(value.getEmail());
+            user.setPassword(value.getPassword());
+            user.setRegistered(true);
         }
 
         if (userRepository.existsByUsername(value.getUsername())) {
@@ -123,8 +119,7 @@ public class UserService {
 
     public User getUserByHttpRequestToken(HttpServletRequest req) {
         String email = jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req));
-        User user = userRepository.findByEmail(email);
-        return user;
+        return userRepository.findByEmail(email);
     }
 
 }

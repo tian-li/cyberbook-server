@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping(path = "register")
-    public ResponseEntity register(@Valid @RequestBody User value) {
-        return userService.register(value);
+    public ResponseEntity register(@Valid @RequestBody User value, HttpServletRequest req) {
+        return userService.register(value, req);
     }
 }

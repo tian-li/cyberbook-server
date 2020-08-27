@@ -22,20 +22,17 @@ public class CategoryController {
         return categoryService.getCategories(req);
     }
 
+    @PostMapping()
+    public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryDTO categoryDTO, HttpServletRequest req) {
+
+
+        return categoryService.addCategory(categoryDTO, req);
+    }
+
     @GetMapping(path = "{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable("id") String id, HttpServletRequest req) {
         return categoryService.getCategoryById(id, req);
     }
-
-    @PostMapping()
-    public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryDTO categoryDTO, HttpServletRequest req) {
-        return categoryService.addCategory(categoryDTO, req);
-    }
-
-//    @PostMapping()
-//    public ResponseEntity<List<Category>> createCategories(@Valid @RequestBody List<CategoryDTO> categoryDTOs, HttpServletRequest req) {
-//        return categoryService.addCategories(categoryDTOs, req);
-//    }
 
     @PutMapping(path = "{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable("id") String id, @RequestBody CategoryDTO value, HttpServletRequest req) {
