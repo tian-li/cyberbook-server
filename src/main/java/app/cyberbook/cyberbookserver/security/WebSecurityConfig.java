@@ -31,13 +31,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // No session will be created or used by spring security
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        // Entry points
-        http.authorizeRequests()//
-                .antMatchers("/users/list", "/users/login", "/users/register", "/users/registerTempUser").permitAll()//
+        http.authorizeRequests()
+                .antMatchers("/users/login", "/users/register", "/users/registerTempUser").permitAll()
                 .anyRequest().authenticated();
-
-        // If a user try to access a resource without having enough permissions
-//        http.exceptionHandling().accessDeniedPage("/users/login");
 
         // Apply JWT
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));

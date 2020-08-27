@@ -16,8 +16,8 @@ import java.util.List;
 @ToString
 @EqualsAndHashCode(of = {"id"})
 public class User {
-
-
+    @ElementCollection(fetch = FetchType.EAGER)
+    List<Role> roles;
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -30,9 +30,4 @@ public class User {
     private Boolean registered;
     private String profilePhotoUrl;
     private Long dateRegistered;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    List<Role> roles;
-
-
 }

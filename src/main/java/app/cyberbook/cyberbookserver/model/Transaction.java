@@ -1,7 +1,6 @@
 package app.cyberbook.cyberbookserver.model;
 
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -31,13 +30,7 @@ public class Transaction {
     private String categoryId;
     private String subscriptionId;
 
-    //    @Temporal(TemporalType.TIMESTAMP)
-//    @CreationTimestamp
     private Long transactionDate;
-    //    @Temporal(TemporalType.TIMESTAMP)
-//    @CreationTimestamp
     private Long dateCreated;
-    //    @Temporal(TemporalType.TIMESTAMP)
-//    @CreationTimestamp
     private Long dateModified;
 }
