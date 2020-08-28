@@ -1,6 +1,9 @@
 package app.cyberbook.cyberbookserver.service;
 
-import app.cyberbook.cyberbookserver.model.*;
+import app.cyberbook.cyberbookserver.model.Transaction;
+import app.cyberbook.cyberbookserver.model.TransactionDTO;
+import app.cyberbook.cyberbookserver.model.TransactionRepository;
+import app.cyberbook.cyberbookserver.model.User;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +18,10 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
+
+    @Autowired
+    private SubscriptionService subscriptionService;
 
     @Autowired
     private UserService userService;
@@ -44,9 +50,14 @@ public class TransactionService {
         User user = userService.getUserByHttpRequestToken(req);
 
         String categoryId = transactionDTO.getCategoryId();
+        String subscriptionId = transactionDTO.getSubscriptionId();
 
-        if (categoryId == null || !isCategoryPresent(categoryId)) {
+        if (categoryId == null || !categoryService.isCategoryPresent(categoryId)) {
             return new ResponseEntity("Category does not exist", HttpStatus.BAD_REQUEST);
+        }
+
+        if (subscriptionId != null && !subscriptionService.isSubscriptionPresent(subscriptionId)) {
+            return new ResponseEntity("Subscription not exist", HttpStatus.BAD_REQUEST);
         }
 
         Transaction transaction = new Transaction();
@@ -55,7 +66,7 @@ public class TransactionService {
         transaction.setAmount(transactionDTO.getAmount());
         transaction.setDescription(transactionDTO.getDescription());
         transaction.setCategoryId(categoryId);
-        transaction.setSubscriptionId(transactionDTO.getSubscriptionId());
+        transaction.setSubscriptionId(subscriptionId);
 
         transaction.setTransactionDate(DateTime.now().getMillis());
         transaction.setDateModified(DateTime.now().getMillis());
@@ -68,13 +79,17 @@ public class TransactionService {
         User user = userService.getUserByHttpRequestToken(req);
         Optional<Transaction> findResult = transactionRepository.findById(id);
 
-
         if (findResult.isPresent()) {
             if (user.getId().equals(findResult.get().getUserId())) {
                 String categoryId = transactionDTO.getCategoryId();
+                String subscriptionId = transactionDTO.getSubscriptionId();
 
-                if (categoryId == null || !isCategoryPresent(categoryId)) {
+                if (categoryId == null || !categoryService.isCategoryPresent(categoryId)) {
                     return new ResponseEntity("Category not exist", HttpStatus.BAD_REQUEST);
+                }
+
+                if (subscriptionId != null && !subscriptionService.isSubscriptionPresent(subscriptionId)) {
+                    return new ResponseEntity("Subscription not exist", HttpStatus.BAD_REQUEST);
                 }
 
                 Transaction transaction = findResult.get();
@@ -82,7 +97,7 @@ public class TransactionService {
                 transaction.setAmount(transactionDTO.getAmount());
                 transaction.setDescription(transactionDTO.getDescription());
                 transaction.setCategoryId(categoryId);
-                transaction.setSubscriptionId(transactionDTO.getSubscriptionId());
+                transaction.setSubscriptionId(subscriptionId);
                 transaction.setDateModified(DateTime.now().getMillis());
                 return ResponseEntity.ok(transactionRepository.save(transaction));
             } else {
@@ -108,11 +123,5 @@ public class TransactionService {
         } else {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-    }
-
-    private Boolean isCategoryPresent(String categoryId) {
-        Optional<Category> category = categoryRepository.findById(categoryId);
-
-        return category.isPresent();
     }
 }

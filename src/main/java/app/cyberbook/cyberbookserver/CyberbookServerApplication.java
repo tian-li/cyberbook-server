@@ -1,6 +1,7 @@
 package app.cyberbook.cyberbookserver;
 
 import app.cyberbook.cyberbookserver.service.CategoryService;
+import app.cyberbook.cyberbookserver.service.SubscriptionService;
 import app.cyberbook.cyberbookserver.service.TransactionService;
 import app.cyberbook.cyberbookserver.service.UserService;
 import org.springframework.boot.SpringApplication;
@@ -38,6 +39,11 @@ public class CyberbookServerApplication {
     @Bean
     public TransactionService transactionService() {
         return new TransactionService();
+    }
+
+    @Bean
+    public SubscriptionService subscriptionService() {
+        return new SubscriptionService();
     }
 
 }

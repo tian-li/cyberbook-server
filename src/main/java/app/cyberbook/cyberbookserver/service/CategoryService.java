@@ -119,4 +119,10 @@ public class CategoryService {
                 }
         );
     }
+
+    public Boolean isCategoryPresent(String categoryId) {
+        Optional<Category> category = categoryRepository.findById(categoryId);
+
+        return category.isPresent();
+    }
 }

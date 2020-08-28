@@ -87,6 +87,11 @@ public class UserService {
         User tokenUser = getUserByHttpRequestToken(req);
 
         if (tokenUser == null) {
+            if (value.getUsername() == null) {
+                return new ResponseEntity("Username can't be empty", HttpStatus.BAD_REQUEST);
+            }
+
+            user.setUsername(value.getUsername());
             user.setBirthday(null);
             user.setEmail(value.getEmail());
             user.setPassword(value.getPassword());
@@ -94,6 +99,8 @@ public class UserService {
             user.setProfilePhotoUrl(null);
             user.setRegistered(true);
             user.setDateRegistered(DateTime.now().getMillis());
+
+
         } else {
             // If this is an existing temp user
             user = tokenUser;
@@ -102,10 +109,10 @@ public class UserService {
             user.setRegistered(true);
         }
 
-        if (userRepository.existsByUsername(value.getUsername())) {
-            throw new CyberbookException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
-        } else if (userRepository.existsByEmail(value.getEmail())) {
-            throw new CyberbookException("Email is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+        if (userRepository.existsByUsername(user.getUsername())) {
+            return new ResponseEntity("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+        } else if (userRepository.existsByEmail(user.getEmail())) {
+            return new ResponseEntity("Email is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         } else {
             List<Role> roles = new ArrayList<>();
             roles.add(Role.ROLE_CLIENT);
@@ -114,12 +121,28 @@ public class UserService {
         }
 
         userRepository.save(user);
-        return ResponseEntity.ok(jwtTokenProvider.createToken(user.getUsername(), user.getRoles()));
+
+        if (tokenUser == null) {
+            try {
+                List<CategoryDTO> categoryDTOs = categoryService.generateDefaultCategoryDTOs();
+                categoryService.createCategories(categoryDTOs, user.getId());
+            } catch (IOException e) {
+                return new ResponseEntity("Error when creating default categories", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return ResponseEntity.ok(jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
     }
 
     public User getUserByHttpRequestToken(HttpServletRequest req) {
-        String email = jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req));
-        return userRepository.findByEmail(email);
+        String token = jwtTokenProvider.resolveToken(req);
+        if (token != null) {
+            String email = jwtTokenProvider.getUsername(token);
+            return userRepository.findByEmail(email);
+        } else {
+            return null;
+        }
+
     }
 
 }
