@@ -61,7 +61,7 @@ public class CategoryService {
                 category.setIcon(categoryDTO.getIcon());
                 category.setColor(categoryDTO.getColor());
                 category.setIsSpend(categoryDTO.getIsSpend());
-                category.setAddedByUser(categoryDTO.getAddedByUser());
+                category.setAddedByUser(true);
                 return ResponseEntity.ok(CyberbookServerResponse.successWithData(categoryRepository.save(category)));
             } else {
                 return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);

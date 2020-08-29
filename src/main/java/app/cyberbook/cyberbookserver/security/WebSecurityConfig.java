@@ -53,7 +53,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
-                .antMatchers( "/users/login", "/users/register", "/users/registerTempUser").permitAll()
+                .antMatchers( "/users/login").permitAll()
+                .antMatchers( "/users/register").permitAll()
+                .antMatchers( "/users/register-temp-user").permitAll()
                 .anyRequest().authenticated();
 
         // Apply JWT

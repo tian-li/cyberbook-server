@@ -100,47 +100,28 @@ public class UserService {
         );
     }
 
-    public ResponseEntity<CyberbookServerResponse<UserDTO>> register(User value, HttpServletRequest req) {
-        if (value == null || value.getEmail() == null || value.getPassword() == null) {
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> register(User value) {
+        if (value == null || value.getUsername() == null || value.getEmail() == null || value.getPassword() == null) {
             return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid register info"), HttpStatus.BAD_REQUEST);
         }
         User user = new User();
-        User tokenUser = getUserByHttpRequestToken(req);
 
-        if (tokenUser == null) {
-            if (value.getUsername() == null) {
-                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Username can't be empty"), HttpStatus.BAD_REQUEST);
-            }
-
-            if (userRepository.existsByUsername(value.getUsername())) {
-                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Username is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-
-            user.setUsername(value.getUsername());
-            user.setBirthday(null);
-            user.setEmail(value.getEmail());
-            user.setPassword(value.getPassword());
-            user.setGender(null);
-            user.setProfilePhotoUrl(null);
-            user.setRegistered(true);
-            user.setDateRegistered(DateTime.now().getMillis());
-
-        } else {
-            if (!user.getUsername().equals(value.getUsername()) && userRepository.existsByUsername(value.getUsername())) {
-                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Username is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-
-            // If this is an existing temp user
-            user = tokenUser;
-            user.setUsername(value.getUsername());
-            user.setEmail(value.getEmail());
-            user.setPassword(value.getPassword());
-            user.setRegistered(true);
+        if (userRepository.existsByUsername(value.getUsername())) {
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Username is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         if (userRepository.existsByEmail(value.getEmail())) {
             return new ResponseEntity(CyberbookServerResponse.noDataMessage("Email is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
         }
+
+        user.setUsername(value.getUsername());
+        user.setBirthday(null);
+        user.setEmail(value.getEmail());
+//        user.setPassword(value.getPassword());
+        user.setGender(0);
+        user.setProfilePhotoUrl(null);
+        user.setRegistered(true);
+        user.setDateRegistered(DateTime.now().getMillis());
 
         List<Role> roles = new ArrayList<>();
         roles.add(Role.ROLE_CLIENT);
@@ -149,13 +130,11 @@ public class UserService {
 
         userRepository.save(user);
 
-        if (tokenUser == null) {
-            try {
-                List<CategoryDTO> categoryDTOs = categoryService.generateDefaultCategoryDTOs();
-                categoryService.createCategories(categoryDTOs, user.getId());
-            } catch (IOException e) {
-                return new ResponseEntity("Error when creating default categories", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        try {
+            List<CategoryDTO> categoryDTOs = categoryService.generateDefaultCategoryDTOs();
+            categoryService.createCategories(categoryDTOs, user.getId());
+        } catch (IOException e) {
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Error when creating default categories"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok(
@@ -164,8 +143,84 @@ public class UserService {
                         jwtTokenProvider.createToken(user.getEmail(), user.getRoles())
                 ))
         );
+    }
 
-//        return ResponseEntity.ok(jwtTokenProvider.createToken(user.getEmail(), user.getRoles()));
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> saveTempUser(User value, HttpServletRequest req) {
+        if (value == null || value.getUsername() == null || value.getEmail() == null || value.getPassword() == null) {
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid register info"), HttpStatus.BAD_REQUEST);
+        }
+
+        User tokenUser = getUserByHttpRequestToken(req);
+
+        if (tokenUser == null) {
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid temp user token"), HttpStatus.BAD_REQUEST);
+
+        } else {
+            // If username is updated when saving temp user, need to check if it is used by other users
+            if (!tokenUser.getUsername().equals(value.getUsername()) && userRepository.existsByUsername(value.getUsername())) {
+                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Username is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+
+            if (userRepository.existsByEmail(value.getEmail())) {
+                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Email is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+
+            // If this is an existing temp user
+            tokenUser.setUsername(value.getUsername());
+            tokenUser.setEmail(value.getEmail());
+            tokenUser.setPassword(value.getPassword());
+            tokenUser.setRegistered(true);
+        }
+
+        List<Role> roles = new ArrayList<>();
+        roles.add(Role.ROLE_CLIENT);
+        tokenUser.setRoles(roles);
+        tokenUser.setPassword(passwordEncoder.encode(value.getPassword()));
+
+        userRepository.save(tokenUser);
+
+        return ResponseEntity.ok(
+                CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
+                        tokenUser,
+                        jwtTokenProvider.createToken(tokenUser.getEmail(), tokenUser.getRoles())
+                ))
+        );
+    }
+
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> updateProfile(User value, HttpServletRequest req) {
+        if (value == null || value.getUsername() == null || value.getEmail() == null || value.getGender() == null || value.getBirthday() == null) {
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid profile info"), HttpStatus.BAD_REQUEST);
+        }
+
+        User tokenUser = getUserByHttpRequestToken(req);
+
+        if (tokenUser == null) {
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid temp user token"), HttpStatus.BAD_REQUEST);
+        } else {
+            // If username is updated when updating profile, need to check if it is used by other users
+            if (!tokenUser.getUsername().equals(value.getUsername()) && userRepository.existsByUsername(value.getUsername())) {
+                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Username is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+
+            // If username is updated when updating profile, need to check if it is used by other users
+            if (!tokenUser.getEmail().equals(value.getEmail()) && userRepository.existsByEmail(value.getEmail())) {
+                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Email is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+
+            tokenUser.setUsername(value.getUsername());
+            tokenUser.setEmail(value.getEmail());
+            tokenUser.setBirthday(value.getBirthday());
+            tokenUser.setGender(value.getGender());
+        }
+
+        userRepository.save(tokenUser);
+
+        return ResponseEntity.ok(
+                CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
+                        tokenUser,
+                        jwtTokenProvider.createToken(tokenUser.getEmail(), tokenUser.getRoles())
+                ))
+        );
     }
 
     public User getUserByHttpRequestToken(HttpServletRequest req) {
