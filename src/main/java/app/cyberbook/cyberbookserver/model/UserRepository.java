@@ -8,6 +8,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     User findByEmail(String email);
 
     @RestResource(exported = false)
+    User findByUsernameOrEmail(String username, String email);
+
+    @RestResource(exported = false)
     boolean existsByEmail(String email);
 
     @RestResource(exported = false)

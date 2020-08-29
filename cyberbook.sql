@@ -38,16 +38,16 @@ create table cyberbook_subscription
     `user_id`       varchar(50)    not null COMMENT '用户id',
     `amount`        decimal(20, 2) not null COMMENT '每次账目数额',
     `description`   varchar(50) COMMENT '描述',
-    `frequency`     int            not null COMMENT '频率：0 - 天，1 - 周，2 - 月， 3 - 年',
-    `interval`      int            not null COMMENT '周期间隔',
+    `frequency`     int            not null COMMENT '频率：1 - 天，2 - 周，3 - 月， 4 - 年',
+    `period`        int            not null COMMENT '周期间隔',
     `start_date`    bigint         not null COMMENT '开始日期，使用UTC时间，毫秒值',
     `end_date`      bigint COMMENT '结束日期，使用UTC时间，毫秒值',
     `category_id`   varchar(50)    not null COMMENT '类别id',
     `date_created`  bigint         not null COMMENT '条目创建日期，使用UTC时间，毫秒值',
     `date_modified` bigint         not null COMMENT '最后一次更新日期，使用UTC时间，毫秒值',
-    `nextDate`      bigint         not null COMMENT '下次发生日期，使用UTC时间，毫秒值',
+    `next_date`     bigint         not null COMMENT '下次发生日期，使用UTC时间，毫秒值',
     `summary`       varchar(50)    not null COMMENT '总结：例：每个月的16号',
-    `totalAmount`   decimal(20, 2) COMMENT '该周期性账目一共产生的数额',
+    `total_amount`  decimal(20, 2) COMMENT '该周期性账目一共产生的数额',
     primary key (`id`)
 ) engine = InnoDB
   DEFAULT CHARSET = utf8;
@@ -68,4 +68,5 @@ create table cyberbook_user
 ) engine = InnoDB
   DEFAULT CHARSET = utf8;
 
-alter table user_roles add constraint FKm2k7ukjafxy6knbm70nrdn49r foreign key (user_id) references cyberbook_user (id)
+alter table user_roles
+    add constraint FKm2k7ukjafxy6knbm70nrdn49r foreign key (user_id) references cyberbook_user (id)

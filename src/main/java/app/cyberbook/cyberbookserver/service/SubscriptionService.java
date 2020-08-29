@@ -20,33 +20,33 @@ public class SubscriptionService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<List<Subscription>> getSubscriptions(HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<List<Subscription>>> getSubscriptions(HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
-        return ResponseEntity.ok(subscriptionRepository.findAllByUserId(user.getId()));
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.findAllByUserId(user.getId())));
     }
 
-    public ResponseEntity<Subscription> getSubscriptionById(String id, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Subscription>> getSubscriptionById(String id, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
         Optional<Subscription> subscription = subscriptionRepository.findById(id);
 
         if (subscription.isPresent()) {
             if (user.getId().equals(subscription.get().getUserId())) {
-                return ResponseEntity.ok(subscription.get());
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscription.get()));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<Subscription> addSubscription(SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Subscription>> addSubscription(SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
 
         String categoryId = subscriptionDTO.getCategoryId();
 
         if (categoryId == null || !categoryService.isCategoryPresent(categoryId)) {
-            return new ResponseEntity("Category does not exist", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Category does not exist"), HttpStatus.BAD_REQUEST);
         }
 
         Subscription subscription = new Subscription();
@@ -68,10 +68,10 @@ public class SubscriptionService {
         subscription.setDateModified(DateTime.now().getMillis());
         subscription.setDateCreated(DateTime.now().getMillis());
 
-        return ResponseEntity.ok(subscriptionRepository.save(subscription));
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.save(subscription)));
     }
 
-    public ResponseEntity<Subscription> updateSubscription(String id, SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Subscription>> updateSubscription(String id, SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
         Optional<Subscription> findResult = subscriptionRepository.findById(id);
 
@@ -81,7 +81,7 @@ public class SubscriptionService {
                 String categoryId = subscriptionDTO.getCategoryId();
 
                 if (categoryId == null || !categoryService.isCategoryPresent(categoryId)) {
-                    return new ResponseEntity("Category not exist", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Category does not exist"), HttpStatus.BAD_REQUEST);
                 }
 
                 Subscription subscription = findResult.get();
@@ -100,12 +100,12 @@ public class SubscriptionService {
                 subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).getMillis());
                 subscription.setNextDate(new DateTime(subscriptionDTO.getNextDate()).getMillis());
 
-                return ResponseEntity.ok(subscriptionRepository.save(subscription));
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.save(subscription)));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -117,12 +117,12 @@ public class SubscriptionService {
         if (subscription.isPresent()) {
             if (user.getId().equals(subscription.get().getUserId())) {
                 subscriptionRepository.deleteById(id);
-                return ResponseEntity.ok(id);
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(id));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 

@@ -1,9 +1,6 @@
 package app.cyberbook.cyberbookserver.service;
 
-import app.cyberbook.cyberbookserver.model.Category;
-import app.cyberbook.cyberbookserver.model.CategoryDTO;
-import app.cyberbook.cyberbookserver.model.CategoryRepository;
-import app.cyberbook.cyberbookserver.model.User;
+import app.cyberbook.cyberbookserver.model.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,35 +21,35 @@ public class CategoryService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<List<Category>> getCategories(HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<List<Category>>> getCategories(HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
-        return ResponseEntity.ok(categoryRepository.findAllByUserId(user.getId()));
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(categoryRepository.findAllByUserId(user.getId())));
     }
 
-    public ResponseEntity<Category> getCategoryById(String id, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Category>> getCategoryById(String id, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
         Optional<Category> category = categoryRepository.findById(id);
 
         if (category.isPresent()) {
             if (user.getId().equals(category.get().getUserId())) {
-                return ResponseEntity.ok(category.get());
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(category.get()));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<Category> addCategory(CategoryDTO categoryDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Category>> addCategory(CategoryDTO categoryDTO, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
         Category category = createCategory(categoryDTO, user.getId());
         category.setAddedByUser(true);
 
-        return ResponseEntity.ok(categoryRepository.save(category));
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(categoryRepository.save(category)));
     }
 
-    public ResponseEntity<Category> updateCategory(String id, CategoryDTO categoryDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Category>> updateCategory(String id, CategoryDTO categoryDTO, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
         Optional<Category> findResult = categoryRepository.findById(id);
 
@@ -65,12 +62,12 @@ public class CategoryService {
                 category.setColor(categoryDTO.getColor());
                 category.setIsSpend(categoryDTO.getIsSpend());
                 category.setAddedByUser(categoryDTO.getAddedByUser());
-                return ResponseEntity.ok(categoryRepository.save(category));
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(categoryRepository.save(category)));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -83,10 +80,10 @@ public class CategoryService {
                 categoryRepository.deleteById(id);
                 return ResponseEntity.ok(id);
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 

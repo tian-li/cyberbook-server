@@ -1,9 +1,6 @@
 package app.cyberbook.cyberbookserver.service;
 
-import app.cyberbook.cyberbookserver.model.Transaction;
-import app.cyberbook.cyberbookserver.model.TransactionDTO;
-import app.cyberbook.cyberbookserver.model.TransactionRepository;
-import app.cyberbook.cyberbookserver.model.User;
+import app.cyberbook.cyberbookserver.model.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,38 +23,38 @@ public class TransactionService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<List<Transaction>> getTransactions(HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<List<Transaction>>> getTransactions(HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
-        return ResponseEntity.ok(transactionRepository.findAllByUserId(user.getId()));
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(transactionRepository.findAllByUserId(user.getId())));
     }
 
-    public ResponseEntity<Transaction> getTransactionById(String id, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Transaction>> getTransactionById(String id, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
         Optional<Transaction> transaction = transactionRepository.findById(id);
 
         if (transaction.isPresent()) {
             if (user.getId().equals(transaction.get().getUserId())) {
-                return ResponseEntity.ok(transaction.get());
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(transaction.get()));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 
-    public ResponseEntity<Transaction> addTransaction(TransactionDTO transactionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Transaction>> addTransaction(TransactionDTO transactionDTO, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
 
         String categoryId = transactionDTO.getCategoryId();
         String subscriptionId = transactionDTO.getSubscriptionId();
 
         if (categoryId == null || !categoryService.isCategoryPresent(categoryId)) {
-            return new ResponseEntity("Category does not exist", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Category does not exist"), HttpStatus.BAD_REQUEST);
         }
 
         if (subscriptionId != null && !subscriptionService.isSubscriptionPresent(subscriptionId)) {
-            return new ResponseEntity("Subscription not exist", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Subscription does not exist"), HttpStatus.BAD_REQUEST);
         }
 
         Transaction transaction = new Transaction();
@@ -72,10 +69,10 @@ public class TransactionService {
         transaction.setDateModified(DateTime.now().getMillis());
         transaction.setDateCreated(DateTime.now().getMillis());
 
-        return ResponseEntity.ok(transactionRepository.save(transaction));
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(transactionRepository.save(transaction)));
     }
 
-    public ResponseEntity<Transaction> updateTransaction(String id, TransactionDTO transactionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Transaction>> updateTransaction(String id, TransactionDTO transactionDTO, HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
         Optional<Transaction> findResult = transactionRepository.findById(id);
 
@@ -85,11 +82,12 @@ public class TransactionService {
                 String subscriptionId = transactionDTO.getSubscriptionId();
 
                 if (categoryId == null || !categoryService.isCategoryPresent(categoryId)) {
-                    return new ResponseEntity("Category not exist", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Category does not exist"), HttpStatus.BAD_REQUEST);
                 }
 
                 if (subscriptionId != null && !subscriptionService.isSubscriptionPresent(subscriptionId)) {
-                    return new ResponseEntity("Subscription not exist", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Subscription does not exist"), HttpStatus.BAD_REQUEST);
+
                 }
 
                 Transaction transaction = findResult.get();
@@ -99,12 +97,12 @@ public class TransactionService {
                 transaction.setCategoryId(categoryId);
                 transaction.setSubscriptionId(subscriptionId);
                 transaction.setDateModified(DateTime.now().getMillis());
-                return ResponseEntity.ok(transactionRepository.save(transaction));
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(transactionRepository.save(transaction)));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -116,12 +114,12 @@ public class TransactionService {
         if (transaction.isPresent()) {
             if (user.getId().equals(transaction.get().getUserId())) {
                 transactionRepository.deleteById(id);
-                return ResponseEntity.ok(id);
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(id));
             } else {
-                return new ResponseEntity(HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }
         } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
 }

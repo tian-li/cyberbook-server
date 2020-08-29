@@ -1,5 +1,6 @@
 package app.cyberbook.cyberbookserver.controller;
 
+import app.cyberbook.cyberbookserver.model.CyberbookServerResponse;
 import app.cyberbook.cyberbookserver.model.Subscription;
 import app.cyberbook.cyberbookserver.model.SubscriptionDTO;
 import app.cyberbook.cyberbookserver.service.SubscriptionService;
@@ -18,22 +19,22 @@ public class SubscriptionController {
     SubscriptionService subscriptionService;
 
     @GetMapping()
-    public ResponseEntity<List<Subscription>> getSubscriptions(HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<List<Subscription>>> getSubscriptions(HttpServletRequest req) {
         return subscriptionService.getSubscriptions(req);
     }
 
     @PostMapping()
-    public ResponseEntity<Subscription> addSubscription(@Valid @RequestBody SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Subscription>> addSubscription(@Valid @RequestBody SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
         return subscriptionService.addSubscription(subscriptionDTO, req);
     }
 
     @GetMapping(path = "{id}")
-    public ResponseEntity<Subscription> getSubscriptionById(@PathVariable("id") String id, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Subscription>> getSubscriptionById(@PathVariable("id") String id, HttpServletRequest req) {
         return subscriptionService.getSubscriptionById(id, req);
     }
 
     @PutMapping(path = "{id}")
-    public ResponseEntity<Subscription> updateSubscription(@PathVariable("id") String id, @RequestBody SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Subscription>> updateSubscription(@PathVariable("id") String id, @RequestBody SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
         return subscriptionService.updateSubscription(id, subscriptionDTO, req);
     }
 

@@ -1,6 +1,8 @@
 package app.cyberbook.cyberbookserver.controller;
 
+import app.cyberbook.cyberbookserver.model.CyberbookServerResponse;
 import app.cyberbook.cyberbookserver.model.User;
+import app.cyberbook.cyberbookserver.model.UserDTO;
 import app.cyberbook.cyberbookserver.model.UserRepository;
 import app.cyberbook.cyberbookserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +21,23 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @PostMapping(path = "loginWithToken")
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> loginWithToken(HttpServletRequest req) {
+        return  userService.loginWithToken(req);
+    }
+
     @PostMapping(path = "registerTempUser")
-    public ResponseEntity registerTempUser() {
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> registerTempUser() {
         return userService.registerTempUser();
     }
 
     @PostMapping(path = "login")
-    public ResponseEntity login(@RequestBody User value) {
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> login(@RequestBody User value) {
         return userService.login(value);
     }
 
-    @GetMapping(path = "list")
-    public ResponseEntity list() {
-        return ResponseEntity.ok(userRepository.findAll());
-    }
-
     @PostMapping(path = "register")
-    public ResponseEntity register(@Valid @RequestBody User value, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> register(@RequestBody User value, HttpServletRequest req) {
         return userService.register(value, req);
     }
 }

@@ -1,5 +1,6 @@
 package app.cyberbook.cyberbookserver.controller;
 
+import app.cyberbook.cyberbookserver.model.CyberbookServerResponse;
 import app.cyberbook.cyberbookserver.model.Transaction;
 import app.cyberbook.cyberbookserver.model.TransactionDTO;
 import app.cyberbook.cyberbookserver.service.TransactionService;
@@ -18,22 +19,22 @@ public class TransactionController {
     TransactionService transactionService;
 
     @GetMapping()
-    public ResponseEntity<List<Transaction>> getTransactions(HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<List<Transaction>>> getTransactions(HttpServletRequest req) {
         return transactionService.getTransactions(req);
     }
 
     @PostMapping()
-    public ResponseEntity<Transaction> addTransaction(@Valid @RequestBody TransactionDTO transactionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Transaction>> addTransaction(@Valid @RequestBody TransactionDTO transactionDTO, HttpServletRequest req) {
         return transactionService.addTransaction(transactionDTO, req);
     }
 
     @GetMapping(path = "{id}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable("id") String id, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Transaction>> getTransactionById(@PathVariable("id") String id, HttpServletRequest req) {
         return transactionService.getTransactionById(id, req);
     }
 
     @PutMapping(path = "{id}")
-    public ResponseEntity<Transaction> updateTransaction(@PathVariable("id") String id, @RequestBody TransactionDTO transactionDTO, HttpServletRequest req) {
+    public ResponseEntity<CyberbookServerResponse<Transaction>> updateTransaction(@PathVariable("id") String id, @RequestBody TransactionDTO transactionDTO, HttpServletRequest req) {
         return transactionService.updateTransaction(id, transactionDTO, req);
     }
 
