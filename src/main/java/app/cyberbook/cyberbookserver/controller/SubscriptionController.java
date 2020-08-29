@@ -28,6 +28,11 @@ public class SubscriptionController {
         return subscriptionService.addSubscription(subscriptionDTO, req);
     }
 
+    @PostMapping(path = "stop/{id}")
+    public ResponseEntity<CyberbookServerResponse<Subscription>> stopSubscription(@PathVariable("id") String id, @RequestBody SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
+        return subscriptionService.stopSubscription(id, subscriptionDTO, req);
+    }
+
     @GetMapping(path = "{id}")
     public ResponseEntity<CyberbookServerResponse<Subscription>> getSubscriptionById(@PathVariable("id") String id, HttpServletRequest req) {
         return subscriptionService.getSubscriptionById(id, req);

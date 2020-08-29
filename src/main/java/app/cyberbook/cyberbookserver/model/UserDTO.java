@@ -19,6 +19,6 @@ public class UserDTO {
     String birthday;
     Boolean registered;
     String profilePhotoUrl;
-    Long dateRegistered;
+    String dateRegistered;
     String jwtToken;
 }

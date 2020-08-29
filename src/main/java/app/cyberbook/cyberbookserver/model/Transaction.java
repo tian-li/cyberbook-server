@@ -30,7 +30,7 @@ public class Transaction {
     private String categoryId;
     private String subscriptionId;
 
-    private Long transactionDate;
-    private Long dateCreated;
-    private Long dateModified;
+    private String transactionDate;
+    private String dateCreated;
+    private String dateModified;
 }

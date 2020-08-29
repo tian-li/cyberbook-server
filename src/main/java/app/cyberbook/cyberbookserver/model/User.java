@@ -29,5 +29,5 @@ public class User {
     private String birthday;
     private Boolean registered;
     private String profilePhotoUrl;
-    private Long dateRegistered;
+    private String dateRegistered;
 }

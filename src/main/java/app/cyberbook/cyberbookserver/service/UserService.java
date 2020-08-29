@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static app.cyberbook.cyberbookserver.model.Const.ISOFormat;
+
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -78,7 +80,7 @@ public class UserService {
         user.setGender(null);
         user.setProfilePhotoUrl(null);
         user.setRegistered(false);
-        user.setDateRegistered(DateTime.now().getMillis());
+        user.setDateRegistered(DateTime.now().toString(ISOFormat));
 
         List<Role> roles = new ArrayList<>();
         roles.add(Role.ROLE_CLIENT);
@@ -121,7 +123,7 @@ public class UserService {
         user.setGender(0);
         user.setProfilePhotoUrl(null);
         user.setRegistered(true);
-        user.setDateRegistered(DateTime.now().getMillis());
+        user.setDateRegistered(DateTime.now().toString(ISOFormat));
 
         List<Role> roles = new ArrayList<>();
         roles.add(Role.ROLE_CLIENT);

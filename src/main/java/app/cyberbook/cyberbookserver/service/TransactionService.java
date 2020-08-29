@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
+import static app.cyberbook.cyberbookserver.model.Const.ISOFormat;
+
 public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
@@ -65,9 +67,9 @@ public class TransactionService {
         transaction.setCategoryId(categoryId);
         transaction.setSubscriptionId(subscriptionId);
 
-        transaction.setTransactionDate(DateTime.now().getMillis());
-        transaction.setDateModified(DateTime.now().getMillis());
-        transaction.setDateCreated(DateTime.now().getMillis());
+        transaction.setTransactionDate(DateTime.now().toString(ISOFormat));
+        transaction.setDateModified(DateTime.now().toString(ISOFormat));
+        transaction.setDateCreated(DateTime.now().toString(ISOFormat));
 
         return ResponseEntity.ok(CyberbookServerResponse.successWithData(transactionRepository.save(transaction)));
     }
@@ -96,7 +98,7 @@ public class TransactionService {
                 transaction.setDescription(transactionDTO.getDescription());
                 transaction.setCategoryId(categoryId);
                 transaction.setSubscriptionId(subscriptionId);
-                transaction.setDateModified(DateTime.now().getMillis());
+                transaction.setDateModified(DateTime.now().toString(ISOFormat));
                 return ResponseEntity.ok(CyberbookServerResponse.successWithData(transactionRepository.save(transaction)));
             } else {
                 return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);

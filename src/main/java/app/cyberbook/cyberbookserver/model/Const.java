@@ -1,7 +1,7 @@
 package app.cyberbook.cyberbookserver.model;
 
 public class Const {
-    public static final String ISOFormat = "dd/MM/YYYY'T'HH:mm:ss.SSS'Z'";
+    public static final String ISOFormat = "YYYY-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     public enum TransactionType {
         SPEND(0, "spend"),

@@ -18,7 +18,6 @@ public class CyberbookServerApplication {
     public static void main(String[] args) {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(CyberbookServerApplication.class, args);
-
     }
 
     @Bean

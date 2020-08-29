@@ -33,9 +33,9 @@ public class Subscription {
     private String summary;
     private Integer totalAmount;
 
-    private Long startDate;
-    private Long endDate;
-    private Long dateCreated;
-    private Long dateModified;
-    private Long nextDate;
+    private String startDate;
+    private String endDate;
+    private String dateCreated;
+    private String dateModified;
+    private String nextDate;
 }

@@ -20,7 +20,7 @@ public class TransactionDTO {
     String description;
     String categoryId;
 
-    Long transactionDate;
-    Long dateCreated;
-    Long dateModified;
+    String transactionDate;
+    String dateCreated;
+    String dateModified;
 }

@@ -21,9 +21,9 @@ public class SubscriptionDTO {
     String summary;
     Integer totalAmount;
 
-    Long startDate;
-    Long endDate;
-    Long dateCreated;
-    Long dateModified;
-    Long nextDate;
+    String startDate;
+    String endDate;
+    String dateCreated;
+    String dateModified;
+    String nextDate;
 }
