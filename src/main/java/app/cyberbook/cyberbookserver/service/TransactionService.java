@@ -124,4 +124,24 @@ public class TransactionService {
             return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.NOT_FOUND);
         }
     }
+
+    public Transaction createTransactionFromSubscription(Subscription subscription) throws RuntimeException {
+        if (subscription.getCategoryId() == null || !categoryService.isCategoryPresent(subscription.getCategoryId())) {
+            throw new RuntimeException("Category does not exist");
+        }
+
+        Transaction transaction = new Transaction();
+
+        transaction.setUserId(subscription.getUserId());
+        transaction.setAmount(subscription.getAmount());
+        transaction.setDescription(subscription.getDescription());
+        transaction.setCategoryId(subscription.getCategoryId());
+        transaction.setSubscriptionId(subscription.getId());
+
+        transaction.setTransactionDate(DateTime.now().toString(ISOFormat));
+        transaction.setDateCreated(DateTime.now().toString(ISOFormat));
+        transaction.setDateModified(DateTime.now().toString(ISOFormat));
+
+        return transaction;
+    }
 }

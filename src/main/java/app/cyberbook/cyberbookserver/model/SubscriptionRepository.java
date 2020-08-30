@@ -8,4 +8,7 @@ import java.util.List;
 public interface SubscriptionRepository extends JpaRepository<Subscription, String> {
     @RestResource(exported = false)
     List<Subscription> findAllByUserId(String userId);
+
+    @RestResource(exported = false)
+    List<Subscription> findAllByActivateStatusIsTrue();
 }

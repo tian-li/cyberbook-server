@@ -38,4 +38,6 @@ public class Subscription {
     private String dateCreated;
     private String dateModified;
     private String nextDate;
+
+    private Boolean activateStatus;
 }

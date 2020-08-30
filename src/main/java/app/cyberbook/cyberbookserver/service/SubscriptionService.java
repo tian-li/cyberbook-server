@@ -62,6 +62,7 @@ public class SubscriptionService {
         subscription.setPeriod(subscriptionDTO.getPeriod());
         subscription.setSummary(subscriptionDTO.getSummary());
         subscription.setTotalAmount(0);
+        subscription.setActivateStatus(true);
 
         subscription.setStartDate(new DateTime(subscriptionDTO.getStartDate()).toString(ISOFormat));
         subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
@@ -99,6 +100,10 @@ public class SubscriptionService {
                 subscription.setStartDate(new DateTime(subscriptionDTO.getStartDate()).toString(ISOFormat));
                 subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
                 subscription.setNextDate(new DateTime(subscriptionDTO.getNextDate()).toString(ISOFormat));
+
+                if(!new DateTime(subscriptionDTO.getEndDate()).isAfter(DateTime.now())) {
+                    subscription.setActivateStatus(false);
+                }
 
                 return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.save(subscription)));
             } else {
