@@ -19,7 +19,7 @@ public class SubscriptionDTO {
     Integer period;
     String categoryId;
     String summary;
-    Integer totalAmount;
+    BigDecimal totalAmount;
 
     String startDate;
     String endDate;

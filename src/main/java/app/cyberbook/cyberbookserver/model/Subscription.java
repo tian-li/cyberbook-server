@@ -31,7 +31,7 @@ public class Subscription {
     private Integer period;
     private String categoryId;
     private String summary;
-    private Integer totalAmount;
+    private BigDecimal totalAmount;
 
     private String startDate;
     private String endDate;

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,11 +62,17 @@ public class SubscriptionService {
         subscription.setFrequency(subscriptionDTO.getFrequency());
         subscription.setPeriod(subscriptionDTO.getPeriod());
         subscription.setSummary(subscriptionDTO.getSummary());
-        subscription.setTotalAmount(0);
+        subscription.setTotalAmount(new BigDecimal(0));
         subscription.setActivateStatus(true);
 
         subscription.setStartDate(new DateTime(subscriptionDTO.getStartDate()).toString(ISOFormat));
-        subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
+
+        if (subscriptionDTO.getEndDate() != null) {
+            subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
+        } else {
+            subscription.setEndDate(null);
+        }
+
         subscription.setNextDate(new DateTime(subscriptionDTO.getNextDate()).toString(ISOFormat));
 
         subscription.setDateModified(DateTime.now().toString(ISOFormat));
@@ -98,10 +105,14 @@ public class SubscriptionService {
                 subscription.setSummary(subscriptionDTO.getSummary());
 
                 subscription.setStartDate(new DateTime(subscriptionDTO.getStartDate()).toString(ISOFormat));
-                subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
+
+                if (subscriptionDTO.getEndDate() != null) {
+                    subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
+                }
+
                 subscription.setNextDate(new DateTime(subscriptionDTO.getNextDate()).toString(ISOFormat));
 
-                if(!new DateTime(subscriptionDTO.getEndDate()).isAfter(DateTime.now())) {
+                if (!new DateTime(subscriptionDTO.getEndDate()).isAfter(DateTime.now())) {
                     subscription.setActivateStatus(false);
                 }
 

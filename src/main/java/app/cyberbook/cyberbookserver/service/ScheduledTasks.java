@@ -1,22 +1,20 @@
 package app.cyberbook.cyberbookserver.service;
 
 import app.cyberbook.cyberbookserver.model.*;
+import app.cyberbook.cyberbookserver.util.BigDecimalUtil;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static app.cyberbook.cyberbookserver.model.Const.ISOFormat;
 
 @Component
 public class ScheduledTasks {
-//    private Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
 
     @Autowired
     SubscriptionService subscriptionService;
@@ -33,17 +31,16 @@ public class ScheduledTasks {
     @Autowired
     UserRepository userRepository;
 
-//    @Scheduled(cron = "0 * * * * * ")
+    @Scheduled(cron = "0 * * * * * ")
     private void createTransactionFromSubscription() {
-        System.out.println("createTransactionFromSubscription running");
 
-        DateTime now = DateTime.now();
-
+        DateTime now = DateTime.now().withSecondOfMinute(0);
 
         List<Transaction> transactionsCreatedFromSubscription = new ArrayList<>();
         List<Subscription> updatedSubscriptions = new ArrayList<>();
 
         List<Subscription> subscriptions = subscriptionRepository.findAllByActivateStatusIsTrue();
+
         subscriptions.forEach(subscription -> {
             if (!userRepository.existsById(subscription.getUserId())) {
                 subscription.setActivateStatus(false);
@@ -53,7 +50,12 @@ public class ScheduledTasks {
                 return;
             }
 
-//            logger.info();
+            // if end date is same or before now (not after now), should set it to inactive and not add transaction
+            if (subscription.getEndDate() != null && !DateTime.parse(subscription.getEndDate()).isAfter(now)) {
+                subscription.setActivateStatus(false);
+                updatedSubscriptions.add(subscription);
+                return;
+            }
 
             DateTime originalNextDate = DateTime.parse(subscription.getNextDate());
 
@@ -64,36 +66,39 @@ public class ScheduledTasks {
                 Integer period = subscription.getPeriod();
 
                 switch (subscription.getFrequency()) {
-                    case 0:
-                        updatedNextDate = originalNextDate.plusDays(period).toString(ISOFormat);
-                        break;
                     case 1:
-                        updatedNextDate = originalNextDate.plusWeeks(period).toString(ISOFormat);
+                        updatedNextDate = now.plusDays(period).toString(ISOFormat);
                         break;
                     case 2:
-                        updatedNextDate = originalNextDate.plusMonths(period).toString(ISOFormat);
+                        updatedNextDate = now.plusWeeks(period).toString(ISOFormat);
                         break;
                     case 3:
-                        updatedNextDate = originalNextDate.plusYears(period).toString(ISOFormat);
+                        updatedNextDate = now.plusMonths(period).toString(ISOFormat);
                         break;
                     case 4:
-                        updatedNextDate = originalNextDate.plusMinutes(period).toString(ISOFormat);
+                        updatedNextDate = now.plusYears(period).toString(ISOFormat);
+                        break;
+                    case 5:
+                        updatedNextDate = now.plusMinutes(period).toString(ISOFormat);
                         break;
                     default:
                         updatedNextDate = subscription.getNextDate();
                         break;
                 }
 
-//                if ()
-
                 subscription.setNextDate(updatedNextDate);
                 subscription.setDateModified(DateTime.now().toString(ISOFormat));
+                BigDecimal updatedTotalAmount = BigDecimalUtil.add(
+                        subscription.getTotalAmount().doubleValue(),
+                        subscription.getAmount().doubleValue()
+                );
+
+                subscription.setTotalAmount(updatedTotalAmount);
                 updatedSubscriptions.add(subscription);
             }
         });
 
         transactionRepository.saveAll(transactionsCreatedFromSubscription);
         subscriptionRepository.saveAll(updatedSubscriptions);
-
     }
 }
