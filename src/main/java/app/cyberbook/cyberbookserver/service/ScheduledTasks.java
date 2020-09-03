@@ -34,7 +34,9 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 * * * * * ")
     private void createTransactionFromSubscription() {
 
-        DateTime now = DateTime.now().withSecondOfMinute(0);
+        DateTime now = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0);
+
+        System.out.println("now in scheduled task: "+ now.toString(ISOFormat));
 
         List<Transaction> transactionsCreatedFromSubscription = new ArrayList<>();
         List<Subscription> updatedSubscriptions = new ArrayList<>();
@@ -60,7 +62,7 @@ public class ScheduledTasks {
             DateTime originalNextDate = DateTime.parse(subscription.getNextDate());
 
             if (!originalNextDate.isAfter(now)) {
-                transactionsCreatedFromSubscription.add(transactionService.createTransactionFromSubscription(subscription));
+                transactionsCreatedFromSubscription.add(transactionService.createTransactionFromSubscription(subscription, now));
 
                 String updatedNextDate;
                 Integer period = subscription.getPeriod();

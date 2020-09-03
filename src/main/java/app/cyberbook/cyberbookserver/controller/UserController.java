@@ -4,11 +4,14 @@ import app.cyberbook.cyberbookserver.model.CyberbookServerResponse;
 import app.cyberbook.cyberbookserver.model.User;
 import app.cyberbook.cyberbookserver.model.UserDTO;
 import app.cyberbook.cyberbookserver.service.UserService;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static app.cyberbook.cyberbookserver.model.Const.ISOFormat;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -44,5 +47,18 @@ public class UserController {
     @PutMapping(path = "update-profile")
     public ResponseEntity<CyberbookServerResponse<UserDTO>> updateProfile(@RequestBody User value, HttpServletRequest req) {
         return userService.updateProfile(value, req);
+    }
+
+    @GetMapping(path = "timezone")
+    public ResponseEntity<String> getTimezone() {
+        DateTime now = DateTime.now();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Timezone: " + now.getZone().toString())
+                .append("; Time: "+now.toString(ISOFormat));
+
+
+        return ResponseEntity.ok(sb.toString());
+
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +47,7 @@ public class TransactionService {
     }
 
     public ResponseEntity<CyberbookServerResponse<Transaction>> addTransaction(TransactionDTO transactionDTO, HttpServletRequest req) {
+        DateTime now = DateTime.now();
         User user = userService.getUserByHttpRequestToken(req);
 
         String categoryId = transactionDTO.getCategoryId();
@@ -67,9 +69,9 @@ public class TransactionService {
         transaction.setCategoryId(categoryId);
         transaction.setSubscriptionId(subscriptionId);
 
-        transaction.setTransactionDate(DateTime.now().toString(ISOFormat));
-        transaction.setDateModified(DateTime.now().toString(ISOFormat));
-        transaction.setDateCreated(DateTime.now().toString(ISOFormat));
+        transaction.setTransactionDate(now.toString(ISOFormat));
+        transaction.setDateModified(now.toString(ISOFormat));
+        transaction.setDateCreated(now.toString(ISOFormat));
 
         return ResponseEntity.ok(CyberbookServerResponse.successWithData(transactionRepository.save(transaction)));
     }
@@ -125,7 +127,7 @@ public class TransactionService {
         }
     }
 
-    public Transaction createTransactionFromSubscription(Subscription subscription) throws RuntimeException {
+    public Transaction createTransactionFromSubscription(Subscription subscription, DateTime now) throws RuntimeException {
         if (subscription.getCategoryId() == null || !categoryService.isCategoryPresent(subscription.getCategoryId())) {
             throw new RuntimeException("Category does not exist");
         }
@@ -138,9 +140,9 @@ public class TransactionService {
         transaction.setCategoryId(subscription.getCategoryId());
         transaction.setSubscriptionId(subscription.getId());
 
-        transaction.setTransactionDate(DateTime.now().toString(ISOFormat));
-        transaction.setDateCreated(DateTime.now().toString(ISOFormat));
-        transaction.setDateModified(DateTime.now().toString(ISOFormat));
+        transaction.setTransactionDate(now.toString(ISOFormat));
+        transaction.setDateCreated(now.toString(ISOFormat));
+        transaction.setDateModified(now.toString(ISOFormat));
 
         return transaction;
     }
