@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import static app.cyberbook.cyberbookserver.model.Const.ISOFormat;
 
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/api/users")
 public class UserController {
     @Autowired
     private UserService userService;

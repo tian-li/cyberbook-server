@@ -91,7 +91,7 @@ public class UserService {
             List<CategoryDTO> categoryDTOs = categoryService.generateDefaultCategoryDTOs();
             categoryService.createCategories(categoryDTOs, user.getId());
         } catch (IOException e) {
-            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Error when creating default categories"), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Error when creating default categories when creating temp user"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return ResponseEntity.ok(
@@ -119,7 +119,6 @@ public class UserService {
         user.setUsername(value.getUsername());
         user.setBirthday(null);
         user.setEmail(value.getEmail());
-//        user.setPassword(value.getPassword());
         user.setGender(0);
         user.setProfilePhotoUrl(null);
         user.setRegistered(true);

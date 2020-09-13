@@ -111,7 +111,7 @@ public class CategoryService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         return objectMapper.readValue(
-                new ClassPathResource("./default-categories.json").getFile(),
+                new ClassPathResource("default-categories.json").getInputStream(),
                 new TypeReference<List<CategoryDTO>>() {
                 }
         );

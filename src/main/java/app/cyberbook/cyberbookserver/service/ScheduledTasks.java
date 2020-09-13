@@ -31,12 +31,16 @@ public class ScheduledTasks {
     @Autowired
     UserRepository userRepository;
 
-    @Scheduled(cron = "0 * * * * * ")
+    // @Scheduled(cron = "[Seconds] [Minutes] [Hours] [Day of month] [Month] [Day of week] [Year]")
+    // @Scheduled(cron = "0 * * * * *") // 每分钟一次
+    @Scheduled(cron = "0 0 * * * *") // 每小时一次
     private void createTransactionFromSubscription() {
 
-        DateTime now = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0);
+    // DateTime now = DateTime.now().withSecondOfMinute(0).withMillisOfSecond(0); // 每分钟
+        DateTime now = DateTime.now().withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0); // 每小时
 
-        System.out.println("now in scheduled task: "+ now.toString(ISOFormat));
+
+        System.out.println("now in scheduled task: " + now.toString(ISOFormat));
 
         List<Transaction> transactionsCreatedFromSubscription = new ArrayList<>();
         List<Subscription> updatedSubscriptions = new ArrayList<>();
@@ -80,9 +84,9 @@ public class ScheduledTasks {
                     case 4:
                         updatedNextDate = now.plusYears(period).toString(ISOFormat);
                         break;
-                    case 5:
-                        updatedNextDate = now.plusMinutes(period).toString(ISOFormat);
-                        break;
+//                    case 5: // 分钟
+//                        updatedNextDate = now.plusMinutes(period).toString(ISOFormat);
+//                        break;
                     default:
                         updatedNextDate = subscription.getNextDate();
                         break;

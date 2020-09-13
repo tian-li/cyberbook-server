@@ -13,7 +13,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/subscriptions")
+@RequestMapping(path = "/api/subscriptions")
 public class SubscriptionController {
     @Autowired
     SubscriptionService subscriptionService;

@@ -13,7 +13,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/transactions")
+@RequestMapping(path = "/api/transactions")
 public class TransactionController {
     @Autowired
     TransactionService transactionService;
