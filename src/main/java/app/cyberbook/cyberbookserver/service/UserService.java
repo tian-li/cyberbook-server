@@ -42,7 +42,7 @@ public class UserService {
             return ResponseEntity.ok(
                     CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
                             user,
-                            jwtTokenProvider.createToken(user.getEmail(), user.getRoles())
+                            jwtTokenProvider.createToken(user.getUsernameOrEmail(), user.getRoles())
                     ))
             );
         } else {
@@ -58,7 +58,7 @@ public class UserService {
 
             User user = userRepository.findByEmail(value.getEmail());
 
-            String jwtToken = jwtTokenProvider.createToken(user.getEmail(), user.getRoles());
+            String jwtToken = jwtTokenProvider.createToken(user.getUsernameOrEmail(), user.getRoles());
 
             return ResponseEntity.ok(
                     CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
@@ -97,7 +97,7 @@ public class UserService {
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
                         user,
-                        jwtTokenProvider.createToken(user.getUsername(), user.getRoles())
+                        jwtTokenProvider.createToken(user.getUsernameOrEmail(), user.getRoles())
                 ))
         );
     }
@@ -141,7 +141,7 @@ public class UserService {
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
                         user,
-                        jwtTokenProvider.createToken(user.getEmail(), user.getRoles())
+                        jwtTokenProvider.createToken(user.getUsernameOrEmail(), user.getRoles())
                 ))
         );
     }
@@ -183,7 +183,7 @@ public class UserService {
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
                         tokenUser,
-                        jwtTokenProvider.createToken(tokenUser.getEmail(), tokenUser.getRoles())
+                        jwtTokenProvider.createToken(tokenUser.getUsernameOrEmail(), tokenUser.getRoles())
                 ))
         );
     }
@@ -219,9 +219,21 @@ public class UserService {
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
                         tokenUser,
-                        jwtTokenProvider.createToken(tokenUser.getEmail(), tokenUser.getRoles())
+                        jwtTokenProvider.createToken(tokenUser.getUsernameOrEmail(), tokenUser.getRoles())
                 ))
         );
+    }
+
+    public ResponseEntity<CyberbookServerResponse> setTheme(String theme, HttpServletRequest req) {
+        User tokenUser = getUserByHttpRequestToken(req);
+
+        if (tokenUser == null) {
+            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid temp user token"), HttpStatus.BAD_REQUEST);
+        } else {
+            tokenUser.setTheme(theme);
+            userRepository.save(tokenUser);
+            return ResponseEntity.ok(CyberbookServerResponse.successNoData());
+        }
     }
 
     public User getUserByHttpRequestToken(HttpServletRequest req) {
@@ -246,6 +258,7 @@ public class UserService {
         userDTO.setProfilePhotoUrl(user.getProfilePhotoUrl());
         userDTO.setRegistered(user.getRegistered());
         userDTO.setUsername(user.getUsername());
+        userDTO.setTheme(user.getTheme());
         userDTO.setJwtToken(jwtToken);
 
         return userDTO;

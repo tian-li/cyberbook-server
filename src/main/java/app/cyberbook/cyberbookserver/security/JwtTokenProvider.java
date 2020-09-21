@@ -25,8 +25,11 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${security.jwt.token.expire-length:3600000}")
-    private final long validityInMilliseconds = 3600000; // 1h
+    @Value("${security.jwt.token.expire-length:604800000}")
+    private final long validityInMilliseconds = 604800000; // 1 week
+
+//     @Value("${security.jwt.token.expire-length:60000}")
+//    private final long validityInMilliseconds = 60000; // 1min
     /**
      * THIS IS NOT A SECURE PRACTICE! For simplicity, we are storing a static key here. Ideally, in a
      * microservices environment, this key would be kept on a config-server.

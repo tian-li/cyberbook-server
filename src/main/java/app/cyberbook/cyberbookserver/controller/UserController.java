@@ -44,6 +44,11 @@ public class UserController {
         return userService.register(value);
     }
 
+    @PostMapping(path = "set-theme")
+    public ResponseEntity<CyberbookServerResponse> setTheme(@RequestBody String theme, HttpServletRequest req) {
+        return userService.setTheme(theme, req);
+    }
+
     @PutMapping(path = "update-profile")
     public ResponseEntity<CyberbookServerResponse<UserDTO>> updateProfile(@RequestBody User value, HttpServletRequest req) {
         return userService.updateProfile(value, req);

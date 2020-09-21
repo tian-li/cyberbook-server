@@ -27,7 +27,12 @@ public class User {
     private String email;
     private Integer gender;
     private String birthday;
+    private String theme;
     private Boolean registered;
     private String profilePhotoUrl;
     private String dateRegistered;
+
+    public String getUsernameOrEmail() {
+        return this.getEmail() != null ? this.getEmail() : this.getUsername();
+    }
 }

@@ -18,6 +18,10 @@ public class CyberbookServerResponse<T> {
         this.message = message;
     }
 
+    public static <T> CyberbookServerResponse<T> successNoData() {
+        return new CyberbookServerResponse<T>(null, "Success");
+    }
+
     public static <T> CyberbookServerResponse<T> successWithData(T data) {
         return new CyberbookServerResponse<T>(data, "Success");
     }

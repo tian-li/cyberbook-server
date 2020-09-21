@@ -21,4 +21,5 @@ public class UserDTO {
     String profilePhotoUrl;
     String dateRegistered;
     String jwtToken;
+    String theme;
 }
