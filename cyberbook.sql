@@ -62,6 +62,7 @@ create table cyberbook_user
     `email`             varchar(225) COMMENT '登录邮箱',
     `gender`            integer default 0 COMMENT '性别：0 - 保密，1 - 男， 2 - 女',
     `birthday`          varchar(50) COMMENT '生日, MM/DD/YYYY',
+    `theme`             varchar(50) COMMENT '选择的主题',
     `registered`        bit     not null default false COMMENT '是否已注册',
     `profile_photo_url` varchar(500) COMMENT '头像url',
     `date_registered`   varchar(50)      not null COMMENT '注册日期，使用UTC时间，毫秒值',
