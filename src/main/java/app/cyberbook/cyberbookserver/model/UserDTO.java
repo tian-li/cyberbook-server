@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,4 +24,5 @@ public class UserDTO {
     String dateRegistered;
     String jwtToken;
     String theme;
+    List<String> messageThreadIds;
 }

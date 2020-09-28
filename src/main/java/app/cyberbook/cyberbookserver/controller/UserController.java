@@ -1,6 +1,7 @@
 package app.cyberbook.cyberbookserver.controller;
 
 import app.cyberbook.cyberbookserver.model.CyberbookServerResponse;
+import app.cyberbook.cyberbookserver.model.Role;
 import app.cyberbook.cyberbookserver.model.User;
 import app.cyberbook.cyberbookserver.model.UserDTO;
 import app.cyberbook.cyberbookserver.service.UserService;
@@ -39,9 +40,14 @@ public class UserController {
         return userService.login(value);
     }
 
+    @PostMapping(path = "register-feedback-manager")
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> registerWithRole(@RequestBody User value) {
+        return userService.register(value, Role.ROLE_FEEDBACK_MANAGER);
+    }
+
     @PostMapping(path = "register")
     public ResponseEntity<CyberbookServerResponse<UserDTO>> register(@RequestBody User value) {
-        return userService.register(value);
+        return userService.register(value, Role.ROLE_CLIENT);
     }
 
     @PostMapping(path = "set-theme")

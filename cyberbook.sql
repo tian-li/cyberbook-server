@@ -1,7 +1,8 @@
-use cyberbook_test;
+CREATE DATABASE IF NOT EXISTS cyberbook;
+use cyberbook;
 
-DROP TABLE IF EXISTS `cyberbook_category`;
-CREATE TABLE `cyberbook_category`
+-- DROP TABLE IF EXISTS `cyberbook_category`;
+CREATE TABLE IF NOT EXISTS `cyberbook_category`
 (
     `id`            varchar(50) NOT NULL COMMENT '类别id',
     `added_by_user` bit     NOT NULL COMMENT '是否是用户自己添加的类别',
@@ -13,10 +14,11 @@ CREATE TABLE `cyberbook_category`
     `user_id`       varchar(50) NOT NULL COMMENT '用户id',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `cyberbook_transaction`;
-create table cyberbook_transaction
+-- DROP TABLE IF EXISTS `cyberbook_transaction`;
+CREATE TABLE IF NOT EXISTS cyberbook_transaction
 (
     `id`               varchar(50)    not null COMMENT '类别id',
     `amount`           decimal(20, 2) not null COMMENT '数额',
@@ -29,10 +31,11 @@ create table cyberbook_transaction
     `user_id`          varchar(50)    not null COMMENT '用户id',
     primary key (`id`)
 ) engine = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `cyberbook_subscription`;
-create table cyberbook_subscription
+-- DROP TABLE IF EXISTS `cyberbook_subscription`;
+CREATE TABLE IF NOT EXISTS cyberbook_subscription
 (
     `id`            varchar(50)    not null COMMENT '周期性账目id',
     `user_id`       varchar(50)    not null COMMENT '用户id',
@@ -51,10 +54,11 @@ create table cyberbook_subscription
     activate_status bit default b'1' not null comment '订阅状态 0 - 已结束或取消 1 - 正在进行',
     primary key (`id`)
 ) engine = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `cyberbook_user`;
-create table cyberbook_user
+-- DROP TABLE IF EXISTS `cyberbook_user`;
+CREATE TABLE IF NOT EXISTS cyberbook_user
 (
     `id`                varchar(50) not null COMMENT '用户id',
     `username`          varchar(225) COMMENT '用户名',
@@ -68,14 +72,40 @@ create table cyberbook_user
     `date_registered`   varchar(50)      not null COMMENT '注册日期，使用UTC时间，毫秒值',
     primary key (`id`)
 ) engine = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `user_roles`;
-create table user_roles
+-- DROP TABLE IF EXISTS `user_roles`;
+CREATE TABLE IF NOT EXISTS user_roles
 (
     user_id varchar(50)  not null,
     roles   int          null,
-    constraint FKm2k7ukjafxy6knbm70nrdn49r
-        foreign key (user_id) references cyberbook_user (id)
+    constraint `user_roles` foreign key (user_id) references cyberbook_user (id)
 ) engine = InnoDB
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+
+create table cyberbook_message_thread_users
+(
+    message_thread_id varchar(255) not null,
+    users_id          varchar(255) not null,
+    constraint FK21q8700bfqr1r545nvpg64h2x
+        foreign key (users_id) references cyberbook_user (id),
+    constraint FKstkjtxrdd37xo01le250s0dyk
+        foreign key (message_thread_id) references cyberbook_message_thread (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
+create table cyberbook_user_message_threads
+(
+    user_id            varchar(255) not null,
+    message_threads_id varchar(255) not null,
+    constraint FKm2vxqxycm4yci7so3h4isg3l0
+        foreign key (message_threads_id) references cyberbook_message_thread (id),
+    constraint FKrb1mqc7ri23ub9wgtahq4fgin
+        foreign key (user_id) references cyberbook_user (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;

@@ -29,6 +29,8 @@ public class User {
     private String birthday;
     private String theme;
     private Boolean registered;
+    @ManyToMany(targetEntity = MessageThread.class)
+    private List<MessageThread> messageThreads;
     private String profilePhotoUrl;
     private String dateRegistered;
 

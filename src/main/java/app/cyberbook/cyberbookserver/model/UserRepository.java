@@ -15,4 +15,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @RestResource(exported = false)
     boolean existsByUsername(String username);
+
+    @RestResource(exported = false)
+    User findByRoles(Role role);
 }

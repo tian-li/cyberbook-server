@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static app.cyberbook.cyberbookserver.model.Const.ISOFormat;
 
@@ -34,6 +35,26 @@ public class UserService {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private MessageThreadService messageThreadService;
+
+    public User getUserById(String id) {
+        return userRepository.findById(id).get();
+    }
+
+    public User getFeedbackManagerUser() {
+        return userRepository.findByRoles(Role.ROLE_FEEDBACK_MANAGER);
+    }
+
+    public User saveTreadToUser(MessageThread messageThread, User user) {
+        List<MessageThread> messageThreadList = user.getMessageThreads();
+        if (messageThreadList == null) {
+            messageThreadList = new ArrayList<>();
+        }
+        messageThreadList.add(messageThread);
+        return userRepository.save(user);
+    }
 
     public ResponseEntity<CyberbookServerResponse<UserDTO>> loginWithToken(HttpServletRequest req) {
         User user = getUserByHttpRequestToken(req);
@@ -57,6 +78,7 @@ public class UserService {
             authenticationManager.authenticate(token);
 
             User user = userRepository.findByEmail(value.getEmail());
+
 
             String jwtToken = jwtTokenProvider.createToken(user.getUsernameOrEmail(), user.getRoles());
 
@@ -102,7 +124,7 @@ public class UserService {
         );
     }
 
-    public ResponseEntity<CyberbookServerResponse<UserDTO>> register(User value) {
+    public ResponseEntity<CyberbookServerResponse<UserDTO>> register(User value, Role role) {
         if (value == null || value.getUsername() == null || value.getEmail() == null || value.getPassword() == null) {
             return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid register info"), HttpStatus.BAD_REQUEST);
         }
@@ -125,7 +147,7 @@ public class UserService {
         user.setDateRegistered(DateTime.now().toString(ISOFormat));
 
         List<Role> roles = new ArrayList<>();
-        roles.add(Role.ROLE_CLIENT);
+        roles.add(role);
         user.setRoles(roles);
         user.setPassword(passwordEncoder.encode(value.getPassword()));
 
@@ -137,6 +159,7 @@ public class UserService {
         } catch (IOException e) {
             return new ResponseEntity(CyberbookServerResponse.noDataMessage("Error when creating default categories"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
 
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
@@ -180,6 +203,7 @@ public class UserService {
 
         userRepository.save(tokenUser);
 
+
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
                         tokenUser,
@@ -215,6 +239,7 @@ public class UserService {
         }
 
         userRepository.save(tokenUser);
+
 
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
@@ -260,6 +285,13 @@ public class UserService {
         userDTO.setUsername(user.getUsername());
         userDTO.setTheme(user.getTheme());
         userDTO.setJwtToken(jwtToken);
+
+        List<MessageThread> messageThreadList = messageThreadService.getMessageThreadListByUserId(user.getId());
+
+        if(messageThreadList != null) {
+            List<String> messageThreadIdList = messageThreadList.stream().map((MessageThread::getId)).collect(Collectors.toList());
+            userDTO.setMessageThreadIds(messageThreadIdList);
+        }
 
         return userDTO;
     }

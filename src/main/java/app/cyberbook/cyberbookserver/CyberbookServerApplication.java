@@ -1,9 +1,6 @@
 package app.cyberbook.cyberbookserver;
 
-import app.cyberbook.cyberbookserver.service.CategoryService;
-import app.cyberbook.cyberbookserver.service.SubscriptionService;
-import app.cyberbook.cyberbookserver.service.TransactionService;
-import app.cyberbook.cyberbookserver.service.UserService;
+import app.cyberbook.cyberbookserver.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +42,16 @@ public class CyberbookServerApplication {
     @Bean
     public SubscriptionService subscriptionService() {
         return new SubscriptionService();
+    }
+
+    @Bean
+    public PrivateMessageService privateMessageService() {
+        return new PrivateMessageService();
+    }
+
+    @Bean
+    public MessageThreadService messageThreadService() {
+        return new MessageThreadService();
     }
 
 }

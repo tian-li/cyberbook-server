@@ -56,6 +56,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers( "/api/users/login").permitAll()
                 .antMatchers( "/api/users/register").permitAll()
                 .antMatchers( "/api/users/register-temp-user").permitAll()
+                .antMatchers( "/api/users/register-feedback-manager").permitAll()
                 .anyRequest().authenticated();
 
         // Apply JWT
