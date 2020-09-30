@@ -14,7 +14,6 @@ import java.util.List;
 @JsonRootName("message_thread")
 public class MessageThreadDTO {
     String id;
-    List<String> userIds = new ArrayList<>();
     int type = MessageType.PRIVATE.getCode();
     String preview;
     String lastMessageDate;

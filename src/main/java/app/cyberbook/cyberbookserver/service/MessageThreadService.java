@@ -1,11 +1,10 @@
 package app.cyberbook.cyberbookserver.service;
 
-import app.cyberbook.cyberbookserver.model.MessageThread;
-import app.cyberbook.cyberbookserver.model.MessageThreadDTO;
-import app.cyberbook.cyberbookserver.model.MessageThreadRepository;
-import app.cyberbook.cyberbookserver.model.User;
+import app.cyberbook.cyberbookserver.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,10 +16,15 @@ public class MessageThreadService {
     @Autowired
     UserService userService;
 
-//    public MessageThread
+    public ResponseEntity<CyberbookServerResponse<List<MessageThread>>> getMessageThreads(HttpServletRequest req) {
+        User user = userService.getUserByHttpRequestToken(req);
+//        return ResponseEntity.ok(CyberbookServerResponse.successWithData(messageThreadRepository.findAllByUsers(user)));
+        return null;
+    }
 
     public List<MessageThread> getMessageThreadListByUserId(String userId) {
-       return messageThreadRepository.findAllByUsers(userService.getUserById(userId));
+//       return messageThreadRepository.findAllByUsers(userService.getUserById(userId));
+        return null;
     }
 
     public boolean userHasMessageThreadId(String userId, String messageThreadId) {
@@ -30,9 +34,9 @@ public class MessageThreadService {
     public MessageThread createMessageThread(MessageThreadDTO messageThreadDTO) {
         MessageThread messageThread = new MessageThread();
 
-        List<User> users = messageThreadDTO.getUserIds().stream().map((userId)-> userService.getUserById(userId)).collect(Collectors.toList());
+//        List<User> users = messageThreadDTO.getUserIds().stream().map((userId)-> userService.getUserById(userId)).collect(Collectors.toList());
 
-        messageThread.setUsers(users);
+//        messageThread.setUsers(users);
         messageThread.setPreview(messageThreadDTO.getPreview());
         messageThread.setType(messageThreadDTO.getType());
 

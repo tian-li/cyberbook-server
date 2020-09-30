@@ -275,6 +275,17 @@ public class UserService {
     private UserDTO createUserDTOWithUserAndToken(User user, String jwtToken) {
         UserDTO userDTO = new UserDTO();
 
+        List<MessageThreadDTO> messageThreadDTOList = user.getMessageThreads().stream().map(messageThread -> {
+            MessageThreadDTO messageThreadDTO = new MessageThreadDTO();
+
+            messageThreadDTO.setLastMessageDate(messageThread.getLastMessageDate());
+            messageThreadDTO.setPreview(messageThread.getPreview());
+            messageThreadDTO.setId(messageThread.getId());
+            messageThreadDTO.setType(messageThread.getType());
+
+            return messageThreadDTO;
+        }).collect(Collectors.toList());
+
         userDTO.setBirthday(user.getBirthday());
         userDTO.setDateRegistered(user.getDateRegistered());
         userDTO.setEmail(user.getEmail());
@@ -285,13 +296,7 @@ public class UserService {
         userDTO.setUsername(user.getUsername());
         userDTO.setTheme(user.getTheme());
         userDTO.setJwtToken(jwtToken);
-
-        List<MessageThread> messageThreadList = messageThreadService.getMessageThreadListByUserId(user.getId());
-
-        if(messageThreadList != null) {
-            List<String> messageThreadIdList = messageThreadList.stream().map((MessageThread::getId)).collect(Collectors.toList());
-            userDTO.setMessageThreadIds(messageThreadIdList);
-        }
+        userDTO.setMessageThreads(messageThreadDTOList);
 
         return userDTO;
     }

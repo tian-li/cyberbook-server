@@ -20,8 +20,9 @@ public class MessageThread {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
-    @ManyToMany(targetEntity = User.class)
-    private List<User> users;
+//    @ManyToMany(targetEntity = User.class)
+//    @ElementCollection
+//    private List<String> userIds;
     private int type;
     private String preview;
     private String lastMessageDate;

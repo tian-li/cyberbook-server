@@ -24,5 +24,5 @@ public class UserDTO {
     String dateRegistered;
     String jwtToken;
     String theme;
-    List<String> messageThreadIds;
+    List<MessageThreadDTO> messageThreads;
 }

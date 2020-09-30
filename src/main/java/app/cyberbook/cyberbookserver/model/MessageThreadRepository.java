@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface MessageThreadRepository extends JpaRepository<MessageThread, String> {
 
-    @RestResource(exported = false)
-    List<MessageThread> findAllByUsers(User user);
+//    @RestResource(exported = false)
+//    List<MessageThread> findAllByUsers(User user);
 }

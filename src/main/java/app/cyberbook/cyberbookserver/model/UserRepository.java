@@ -3,6 +3,8 @@ package app.cyberbook.cyberbookserver.model;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
 
+import java.util.List;
+
 public interface UserRepository extends JpaRepository<User, String> {
     @RestResource(exported = false)
     User findByEmail(String email);
@@ -18,4 +20,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @RestResource(exported = false)
     User findByRoles(Role role);
+
+//    @RestResource(exported = false)
+//    List<MessageThread> findMessageThreadsById(String userId);
 }

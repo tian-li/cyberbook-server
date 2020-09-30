@@ -96,12 +96,12 @@ public class PrivateMessageService {
         privateMessage.setMessage(privateMessageDTO.getMessage());
         privateMessage.setDateCreated(messageDate);
 
-        List<User> users = messageThread.getUsers();
-        users.add(fromUser);
-        users.add(toUser);
+//        List<User> users = messageThread.getUsers();
+//        users.add(fromUser);
+//        users.add(toUser);
 
-        messageThread.setUsers(users);
-        messageThread.setPreview(privateMessageDTO.getMessage().substring(0, 15));
+//        messageThread.setUsers(users);
+        messageThread.setPreview(privateMessageDTO.getMessage().substring(0, Math.min(15, privateMessageDTO.getMessage().length())));
         messageThread.setLastMessageDate(messageDate);
         messageThread.setType(type);
 

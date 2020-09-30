@@ -31,6 +31,9 @@ public class User {
     private Boolean registered;
     @ManyToMany(targetEntity = MessageThread.class)
     private List<MessageThread> messageThreads;
+
+    //    @ElementCollection
+//    private List<String> messageThreadIds;
     private String profilePhotoUrl;
     private String dateRegistered;
 

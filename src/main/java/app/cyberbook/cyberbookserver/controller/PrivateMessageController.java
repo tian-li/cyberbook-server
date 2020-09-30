@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/private-message")
+@RequestMapping(path = "/api/private-messages")
 public class PrivateMessageController {
 
     @Autowired

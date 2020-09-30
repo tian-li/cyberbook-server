@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS cyberbook;
 use cyberbook;
 
 -- DROP TABLE IF EXISTS `cyberbook_category`;
-CREATE TABLE IF NOT EXISTS `cyberbook_category`
+CREATE TABLE IF NOT EXISTS cyberbook_category
 (
     `id`            varchar(50) NOT NULL COMMENT '类别id',
     `added_by_user` bit     NOT NULL COMMENT '是否是用户自己添加的类别',
@@ -97,15 +97,15 @@ create table cyberbook_message_thread_users
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
-
-create table cyberbook_user_message_threads
-(
-    user_id            varchar(255) not null,
-    message_threads_id varchar(255) not null,
-    constraint FKm2vxqxycm4yci7so3h4isg3l0
-        foreign key (message_threads_id) references cyberbook_message_thread (id),
-    constraint FKrb1mqc7ri23ub9wgtahq4fgin
-        foreign key (user_id) references cyberbook_user (id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci;
+--
+-- create table cyberbook_user_message_threads
+-- (
+--     user_id            varchar(255) not null,
+--     message_threads_id varchar(255) not null,
+--     constraint FKm2vxqxycm4yci7so3h4isg3l0
+--         foreign key (message_threads_id) references cyberbook_message_thread (id),
+--     constraint FKrb1mqc7ri23ub9wgtahq4fgin
+--         foreign key (user_id) references cyberbook_user (id)
+-- ) ENGINE = InnoDB
+--   DEFAULT CHARSET = utf8mb4
+--   COLLATE = utf8mb4_0900_ai_ci;
