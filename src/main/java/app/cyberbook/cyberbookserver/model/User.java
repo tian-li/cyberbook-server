@@ -5,6 +5,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,10 +31,8 @@ public class User {
     private String theme;
     private Boolean registered;
     @ManyToMany(targetEntity = MessageThread.class)
-    private List<MessageThread> messageThreads;
+    private List<MessageThread> messageThreads = new ArrayList<>();
 
-    //    @ElementCollection
-//    private List<String> messageThreadIds;
     private String profilePhotoUrl;
     private String dateRegistered;
 

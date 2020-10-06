@@ -18,8 +18,9 @@ public class MessageThreadService {
 
     public ResponseEntity<CyberbookServerResponse<List<MessageThread>>> getMessageThreads(HttpServletRequest req) {
         User user = userService.getUserByHttpRequestToken(req);
-//        return ResponseEntity.ok(CyberbookServerResponse.successWithData(messageThreadRepository.findAllByUsers(user)));
-        return null;
+
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(user.getMessageThreads()));
+//        return null;
     }
 
     public List<MessageThread> getMessageThreadListByUserId(String userId) {
@@ -28,7 +29,13 @@ public class MessageThreadService {
     }
 
     public boolean userHasMessageThreadId(String userId, String messageThreadId) {
-        return getMessageThreadListByUserId(userId).stream().map(MessageThread::getId).collect(Collectors.toList()).contains(messageThreadId);
+        User user = userService.getUserById(userId);
+
+        if(user==null) {
+            return false;
+        } else {
+            return user.getMessageThreads().stream().map(MessageThread::getId).collect(Collectors.toList()).contains(messageThreadId);
+        }
     }
 
     public MessageThread createMessageThread(MessageThreadDTO messageThreadDTO) {

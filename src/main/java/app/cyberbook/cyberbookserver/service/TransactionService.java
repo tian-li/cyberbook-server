@@ -69,7 +69,7 @@ public class TransactionService {
         transaction.setCategoryId(categoryId);
         transaction.setSubscriptionId(subscriptionId);
 
-        transaction.setTransactionDate(now.toString(ISOFormat));
+        transaction.setTransactionDate(transactionDTO.getTransactionDate());
         transaction.setDateModified(now.toString(ISOFormat));
         transaction.setDateCreated(now.toString(ISOFormat));
 
