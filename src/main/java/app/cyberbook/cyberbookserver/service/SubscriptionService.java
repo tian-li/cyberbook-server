@@ -108,13 +108,12 @@ public class SubscriptionService {
 
                 if (subscriptionDTO.getEndDate() != null) {
                     subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
+                    if (!new DateTime(subscriptionDTO.getEndDate()).isAfter(DateTime.now())) {
+                        subscription.setActivateStatus(false);
+                    }
                 }
 
                 subscription.setNextDate(new DateTime(subscriptionDTO.getNextDate()).toString(ISOFormat));
-
-                if (!new DateTime(subscriptionDTO.getEndDate()).isAfter(DateTime.now())) {
-                    subscription.setActivateStatus(false);
-                }
 
                 return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.save(subscription)));
             } else {
@@ -140,6 +139,7 @@ public class SubscriptionService {
                 // which may not be start of day of client local time zone
                 subscription.setDateModified(DateTime.now().toString(ISOFormat));
                 subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
+                subscription.setActivateStatus(false);
 
                 return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.save(subscription)));
             } else {

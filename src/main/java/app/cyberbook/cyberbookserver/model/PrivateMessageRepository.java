@@ -9,4 +9,7 @@ public interface PrivateMessageRepository extends JpaRepository<PrivateMessage, 
 
     @RestResource(exported = false)
     List<PrivateMessage> findAllByMessageThreadId(String threadId);
+
+    @RestResource(exported = false)
+    List<PrivateMessage> findAllByToUserId(String userId);
 }

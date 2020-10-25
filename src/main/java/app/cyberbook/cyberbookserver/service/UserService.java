@@ -39,6 +39,9 @@ public class UserService {
     @Autowired
     private MessageThreadService messageThreadService;
 
+    @Autowired
+    private PrivateMessageService privateMessageService;
+
     public User getUserById(String id) {
         return userRepository.findById(id).get();
     }
@@ -271,6 +274,10 @@ public class UserService {
         }
 
     }
+
+//    public boolean hasUnreadMessage(String userId) {
+//
+//    }
 
     private UserDTO createUserDTOWithUserAndToken(User user, String jwtToken) {
         UserDTO userDTO = new UserDTO();

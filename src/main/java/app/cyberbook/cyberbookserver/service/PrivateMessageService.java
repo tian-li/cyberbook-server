@@ -116,6 +116,10 @@ public class PrivateMessageService {
         }
     }
 
+    public List<PrivateMessage> listAllPrivateMessagesByUserId(String userId) {
+        return privateMessageRepository.findAllByToUserId(userId);
+    }
+
 //    private MessageThread createMessageThread(
 //            User fromUser,
 //            User toUser,
