@@ -68,38 +68,7 @@ public class ScheduledTasks {
             if (!originalNextDate.isAfter(now)) {
                 transactionsCreatedFromSubscription.add(transactionService.createTransactionFromSubscription(subscription, now));
 
-                String updatedNextDate;
-                Integer period = subscription.getPeriod();
-
-                switch (subscription.getFrequency()) {
-                    case 1:
-                        updatedNextDate = now.plusDays(period).toString(ISOFormat);
-                        break;
-                    case 2:
-                        updatedNextDate = now.plusWeeks(period).toString(ISOFormat);
-                        break;
-                    case 3:
-                        updatedNextDate = now.plusMonths(period).toString(ISOFormat);
-                        break;
-                    case 4:
-                        updatedNextDate = now.plusYears(period).toString(ISOFormat);
-                        break;
-//                    case 5: // 分钟
-//                        updatedNextDate = now.plusMinutes(period).toString(ISOFormat);
-//                        break;
-                    default:
-                        updatedNextDate = subscription.getNextDate();
-                        break;
-                }
-
-                subscription.setNextDate(updatedNextDate);
-                subscription.setDateModified(DateTime.now().toString(ISOFormat));
-                BigDecimal updatedTotalAmount = BigDecimalUtil.add(
-                        subscription.getTotalAmount().doubleValue(),
-                        subscription.getAmount().doubleValue()
-                );
-
-                subscription.setTotalAmount(updatedTotalAmount);
+                subscription = subscriptionService.getUpdatedSubscriptionAfterTriggered(subscription, now);
                 updatedSubscriptions.add(subscription);
             }
         });

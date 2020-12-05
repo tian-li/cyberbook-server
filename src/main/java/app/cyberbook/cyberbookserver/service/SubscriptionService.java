@@ -1,6 +1,7 @@
 package app.cyberbook.cyberbookserver.service;
 
 import app.cyberbook.cyberbookserver.model.*;
+import app.cyberbook.cyberbookserver.util.BigDecimalUtil;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,12 @@ public class SubscriptionService {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    TransactionRepository transactionRepository;
 
     @Autowired
     private UserService userService;
@@ -52,6 +59,9 @@ public class SubscriptionService {
             return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Category does not exist"), HttpStatus.BAD_REQUEST);
         }
 
+        DateTime startDate = new DateTime(subscriptionDTO.getStartDate());
+        DateTime dateCreated = new DateTime(subscriptionDTO.getDateCreated());
+
         Subscription subscription = new Subscription();
 
         subscription.setUserId(user.getId());
@@ -65,7 +75,7 @@ public class SubscriptionService {
         subscription.setTotalAmount(new BigDecimal(0));
         subscription.setActivateStatus(true);
 
-        subscription.setStartDate(new DateTime(subscriptionDTO.getStartDate()).toString(ISOFormat));
+        subscription.setStartDate(startDate.toString(ISOFormat));
 
         if (subscriptionDTO.getEndDate() != null) {
             subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
@@ -78,7 +88,17 @@ public class SubscriptionService {
         subscription.setDateModified(DateTime.now().toString(ISOFormat));
         subscription.setDateCreated(DateTime.now().toString(ISOFormat));
 
-        return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.save(subscription)));
+        Subscription savedSubscription = subscriptionRepository.save(subscription);
+
+        // if start date and create date are the same day
+        if (startDate.toLocalDate().isEqual(dateCreated.toLocalDate())) {
+            Transaction transaction = transactionService.createTransactionFromSubscription(savedSubscription, startDate);
+            transactionRepository.save(transaction);
+
+            savedSubscription = getUpdatedSubscriptionAfterTriggered(savedSubscription, startDate);
+        }
+
+        return ResponseEntity.ok(CyberbookServerResponse.successWithData(savedSubscription));
     }
 
     public ResponseEntity<CyberbookServerResponse<Subscription>> updateSubscription(String id, SubscriptionDTO subscriptionDTO, HttpServletRequest req) {
@@ -104,16 +124,12 @@ public class SubscriptionService {
                 subscription.setPeriod(subscriptionDTO.getPeriod());
                 subscription.setSummary(subscriptionDTO.getSummary());
 
-                subscription.setStartDate(new DateTime(subscriptionDTO.getStartDate()).toString(ISOFormat));
-
                 if (subscriptionDTO.getEndDate() != null) {
                     subscription.setEndDate(new DateTime(subscriptionDTO.getEndDate()).toString(ISOFormat));
                     if (!new DateTime(subscriptionDTO.getEndDate()).isAfter(DateTime.now())) {
                         subscription.setActivateStatus(false);
                     }
                 }
-
-                subscription.setNextDate(new DateTime(subscriptionDTO.getNextDate()).toString(ISOFormat));
 
                 return ResponseEntity.ok(CyberbookServerResponse.successWithData(subscriptionRepository.save(subscription)));
             } else {
@@ -170,5 +186,38 @@ public class SubscriptionService {
         Optional<Subscription> subscription = subscriptionRepository.findById(subscriptionId);
 
         return subscription.isPresent();
+    }
+
+    public Subscription getUpdatedSubscriptionAfterTriggered(Subscription subscription, DateTime triggerTime) {
+        String updatedNextDate;
+        Integer period = subscription.getPeriod();
+
+        switch (subscription.getFrequency()) {
+            case 1:
+                updatedNextDate = triggerTime.plusDays(period).toString(ISOFormat);
+                break;
+            case 2:
+                updatedNextDate = triggerTime.plusWeeks(period).toString(ISOFormat);
+                break;
+            case 3:
+                updatedNextDate = triggerTime.plusMonths(period).toString(ISOFormat);
+                break;
+            case 4:
+                updatedNextDate = triggerTime.plusYears(period).toString(ISOFormat);
+                break;
+            default:
+                updatedNextDate = subscription.getNextDate();
+                break;
+        }
+
+        subscription.setNextDate(updatedNextDate);
+        subscription.setDateModified(DateTime.now().toString(ISOFormat));
+        BigDecimal updatedTotalAmount = BigDecimalUtil.add(
+                subscription.getTotalAmount().doubleValue(),
+                subscription.getAmount().doubleValue()
+        );
+
+        subscription.setTotalAmount(updatedTotalAmount);
+        return subscription;
     }
 }
