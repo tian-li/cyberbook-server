@@ -78,7 +78,7 @@ public class CategoryService {
         if (category.isPresent()) {
             if (user.getId().equals(category.get().getUserId())) {
                 categoryRepository.deleteById(id);
-                return ResponseEntity.ok(id);
+                return ResponseEntity.ok(CyberbookServerResponse.successWithData(id));
             } else {
                 return new ResponseEntity<>(CyberbookServerResponse.failedNoData(), HttpStatus.FORBIDDEN);
             }

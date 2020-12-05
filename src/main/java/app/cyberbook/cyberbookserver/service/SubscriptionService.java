@@ -96,6 +96,7 @@ public class SubscriptionService {
             transactionRepository.save(transaction);
 
             savedSubscription = getUpdatedSubscriptionAfterTriggered(savedSubscription, startDate);
+            subscriptionRepository.save(savedSubscription);
         }
 
         return ResponseEntity.ok(CyberbookServerResponse.successWithData(savedSubscription));
