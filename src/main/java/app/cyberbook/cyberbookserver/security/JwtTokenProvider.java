@@ -30,20 +30,11 @@ public class JwtTokenProvider {
 
 //     @Value("${security.jwt.token.expire-length:60000}")
 //    private final long validityInMilliseconds = 60000; // 1min
-    /**
-     * THIS IS NOT A SECURE PRACTICE! For simplicity, we are storing a static key here. Ideally, in a
-     * microservices environment, this key would be kept on a config-server.
-     */
-//    @Value("${security.jwt.token.secret-key:$2a$10$A7M/p/.wFWUENEfduFXYxOg1DSUXoae5ZKYE7l/3IjUe7xYoUt3vK}")
+
     private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     @Autowired
     private MyUserDetails myUserDetails;
-
-//    @PostConstruct
-//    protected void init() {
-////        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-//    }
 
     public String createToken(String username, List<Role> roles) {
 

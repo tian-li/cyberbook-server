@@ -22,25 +22,21 @@ import static app.cyberbook.cyberbookserver.model.Const.ISOFormat;
 
 public class UserService {
     @Autowired
+    TransactionRepository transactionRepository;
+    @Autowired
+    CategoryRepository categoryRepository;
+    @Autowired
+    SubscriptionRepository subscriptionRepository;
+    @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
-
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private CategoryService categoryService;
-
-    @Autowired
-    private MessageThreadService messageThreadService;
-
-    @Autowired
-    private PrivateMessageService privateMessageService;
 
     public User getUserById(String id) {
         return userRepository.findById(id).get();
@@ -274,10 +270,6 @@ public class UserService {
         }
 
     }
-
-//    public boolean hasUnreadMessage(String userId) {
-//
-//    }
 
     private UserDTO createUserDTOWithUserAndToken(User user, String jwtToken) {
         UserDTO userDTO = new UserDTO();

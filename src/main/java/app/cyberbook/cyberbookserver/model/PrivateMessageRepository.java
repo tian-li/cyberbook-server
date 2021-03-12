@@ -12,4 +12,7 @@ public interface PrivateMessageRepository extends JpaRepository<PrivateMessage, 
 
     @RestResource(exported = false)
     List<PrivateMessage> findAllByToUserId(String userId);
+
+    @RestResource(exported = false)
+    void deleteByMessageThreadId(String messageThreadId);
 }

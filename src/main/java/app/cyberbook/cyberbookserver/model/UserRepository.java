@@ -21,6 +21,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     @RestResource(exported = false)
     User findByRoles(Role role);
 
+    @RestResource(exported = false)
+    List<User> findByDateRegisteredLessThanAndRegisteredIsFalse(String dateRegistered);
+
 //    @RestResource(exported = false)
 //    List<MessageThread> findMessageThreadsById(String userId);
 }

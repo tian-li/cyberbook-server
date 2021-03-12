@@ -66,7 +66,7 @@ public class UserController {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Timezone: " + now.getZone().toString())
-                .append("; Time: "+now.toString(ISOFormat));
+                .append("; Time: " + now.toString(ISOFormat));
 
 
         return ResponseEntity.ok(sb.toString());
