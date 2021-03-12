@@ -88,12 +88,11 @@ public class ScheduledTasks {
 //    @Scheduled(cron = "0 * * * * *") // 每分钟一次
     @Scheduled(cron = "0 0 0 * * *") // 每天一次
     private void deleteExpiredTempUser() {
-        System.out.println("deleteExpiredTempUser");
         DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
 
-        String today = DateTime.now().toString(fmt);
+        String aWeekAgo = DateTime.now().minusDays(7).toString(fmt);
 
-        List<User> expiredUsers = userRepository.findByDateRegisteredLessThanAndRegisteredIsFalse(today);
+        List<User> expiredUsers = userRepository.findByDateRegisteredLessThanAndRegisteredIsFalse(aWeekAgo);
 
         expiredUsers.forEach(user -> {
             List<Transaction> transactions = transactionRepository.findAllByUserId(user.getId());
