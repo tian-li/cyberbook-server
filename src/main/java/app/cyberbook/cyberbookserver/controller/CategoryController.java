@@ -25,8 +25,6 @@ public class CategoryController {
 
     @PostMapping()
     public ResponseEntity<CyberbookServerResponse<Category>> createCategory(@Valid @RequestBody CategoryDTO categoryDTO, HttpServletRequest req) {
-
-
         return categoryService.addCategory(categoryDTO, req);
     }
 

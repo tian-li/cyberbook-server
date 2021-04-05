@@ -86,7 +86,7 @@ public class ScheduledTasks {
     }
 
 //    @Scheduled(cron = "0 * * * * *") // 每分钟一次
-    @Scheduled(cron = "0 0 0 * * *") // 每天一次
+    @Scheduled(cron = "0 30 0 * * *") // 每天00:30
     private void deleteExpiredTempUser() {
         DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
 
@@ -102,13 +102,6 @@ public class ScheduledTasks {
             transactionRepository.deleteAll(transactions);
             categoryRepository.deleteAll(categories);
             subscriptionRepository.deleteAll(subscriptions);
-
-            if (user.getMessageThreads().size() > 0) {
-                user.getMessageThreads().forEach(messageThread -> {
-                    messageThreadRepository.deleteById(messageThread.getId());
-                    privateMessageRepository.deleteByMessageThreadId(messageThread.getId());
-                });
-            }
 
             userRepository.delete(user);
         });
