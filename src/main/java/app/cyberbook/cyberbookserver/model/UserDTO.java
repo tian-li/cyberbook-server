@@ -20,7 +20,7 @@ public class UserDTO {
     Integer gender;
     String birthday;
     Boolean registered;
-    String profilePhotoUrl;
+    String profilePhoto;
     String dateRegistered;
     String jwtToken;
     String theme;

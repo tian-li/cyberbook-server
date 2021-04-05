@@ -28,10 +28,12 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.expire-length:604800000}")
     private final long validityInMilliseconds = 604800000; // 1 week
 
-//     @Value("${security.jwt.token.expire-length:60000}")
-//    private final long validityInMilliseconds = 60000; // 1min
+    // For prod use
+    // private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    // For local test
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     @Autowired
     private MyUserDetails myUserDetails;
@@ -48,7 +50,8 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(validity)
-                .signWith(secretKey, SignatureAlgorithm.HS512)
+//                .signWith(secretKey, SignatureAlgorithm.HS512) // For prod use
+                .signWith(SignatureAlgorithm.HS512, secretKey) // For local test
                 .compact();
     }
 

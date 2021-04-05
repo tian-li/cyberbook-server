@@ -33,7 +33,7 @@ public class User {
     @ManyToMany(targetEntity = MessageThread.class)
     private List<MessageThread> messageThreads = new ArrayList<>();
 
-    private String profilePhotoUrl;
+    private String profilePhoto;
     private String dateRegistered;
 
     public String getUsernameOrEmail() {

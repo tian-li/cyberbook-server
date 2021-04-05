@@ -99,7 +99,7 @@ public class UserService {
         user.setBirthday(null);
         user.setEmail(null);
         user.setGender(null);
-        user.setProfilePhotoUrl(null);
+        user.setProfilePhoto(null);
         user.setRegistered(false);
         user.setDateRegistered(DateTime.now().toString(ISOFormat));
 
@@ -141,7 +141,7 @@ public class UserService {
         user.setBirthday(null);
         user.setEmail(value.getEmail());
         user.setGender(0);
-        user.setProfilePhotoUrl(null);
+        user.setProfilePhoto(null);
         user.setRegistered(true);
         user.setDateRegistered(DateTime.now().toString(ISOFormat));
 
@@ -212,33 +212,52 @@ public class UserService {
     }
 
     public ResponseEntity<CyberbookServerResponse<UserDTO>> updateProfile(User value, HttpServletRequest req) {
-        if (value == null || value.getUsername() == null || value.getEmail() == null || value.getGender() == null || value.getBirthday() == null) {
-            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid profile info"), HttpStatus.BAD_REQUEST);
+        if (value == null) {
+            return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Invalid profile info"), HttpStatus.BAD_REQUEST);
         }
 
         User tokenUser = getUserByHttpRequestToken(req);
 
         if (tokenUser == null) {
-            return new ResponseEntity(CyberbookServerResponse.noDataMessage("Invalid temp user token"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Invalid temp user token"), HttpStatus.BAD_REQUEST);
         } else {
-            // If username is updated when updating profile, need to check if it is used by other users
-            if (!tokenUser.getUsername().equals(value.getUsername()) && userRepository.existsByUsername(value.getUsername())) {
-                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Username is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+//            tokenUser.setUsername(value.getUsername());
+//            tokenUser.setEmail(value.getEmail());
+//            tokenUser.setBirthday(value.getBirthday());
+//            tokenUser.setGender(value.getGender());
+
+            if (value.getUsername() != null) {
+                // If username is updated when updating profile, need to check if it is used by other users
+                if (!tokenUser.getUsername().equals(value.getUsername()) && userRepository.existsByUsername(value.getUsername())) {
+                    return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Username is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+                } else {
+                    tokenUser.setUsername(value.getUsername());
+                }
             }
 
-            // If username is updated when updating profile, need to check if it is used by other users
-            if (!tokenUser.getEmail().equals(value.getEmail()) && userRepository.existsByEmail(value.getEmail())) {
-                return new ResponseEntity(CyberbookServerResponse.noDataMessage("Email is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+            if (value.getEmail() != null) {
+                // If email is updated when updating profile, need to check if it is used by other users
+                if (!tokenUser.getEmail().equals(value.getEmail()) && userRepository.existsByEmail(value.getEmail())) {
+                    return new ResponseEntity<>(CyberbookServerResponse.noDataMessage("Email is already in use"), HttpStatus.UNPROCESSABLE_ENTITY);
+                } else {
+                    tokenUser.setEmail(value.getEmail());
+                }
             }
 
-            tokenUser.setUsername(value.getUsername());
-            tokenUser.setEmail(value.getEmail());
-            tokenUser.setBirthday(value.getBirthday());
-            tokenUser.setGender(value.getGender());
+            if (value.getBirthday() != null) {
+                tokenUser.setBirthday(value.getBirthday());
+            }
+
+            if (value.getGender() != null) {
+                tokenUser.setGender(value.getGender());
+            }
+
+            if (value.getProfilePhoto() != null) {
+                tokenUser.setProfilePhoto(value.getProfilePhoto());
+            }
         }
 
         userRepository.save(tokenUser);
-
 
         return ResponseEntity.ok(
                 CyberbookServerResponse.successWithData(createUserDTOWithUserAndToken(
@@ -290,7 +309,7 @@ public class UserService {
         userDTO.setEmail(user.getEmail());
         userDTO.setGender(user.getGender());
         userDTO.setId(user.getId());
-        userDTO.setProfilePhotoUrl(user.getProfilePhotoUrl());
+        userDTO.setProfilePhoto(user.getProfilePhoto());
         userDTO.setRegistered(user.getRegistered());
         userDTO.setUsername(user.getUsername());
         userDTO.setTheme(user.getTheme());

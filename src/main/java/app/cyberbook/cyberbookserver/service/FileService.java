@@ -18,7 +18,12 @@ public class FileService {
     private final Logger logger = LoggerFactory.getLogger(FileService.class);
 
 
-    public ResponseEntity<CyberbookServerResponse<String>> upload(MultipartFile file, String tempLocalPath, String remotePath) {
+    public ResponseEntity<CyberbookServerResponse<String>> upload(
+            MultipartFile file,
+            String tempLocalPath,
+            String remotePath,
+            String imageToDelete
+    ) {
         String fileName = file.getOriginalFilename();
         // 获取扩展名 abc.jpg -> jpg
         String fileExtensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
@@ -42,7 +47,8 @@ public class FileService {
             // 此时文件已经上传成功
 
             // 将 targetFile 上传到 ftp
-            FTPUtil.uploadFile(Lists.newArrayList(targetFile), remotePath);
+            FTPUtil.uploadFile(Lists.newArrayList(targetFile), remotePath, imageToDelete);
+
             // 此时已经上传到ftp
 
             // 上传完之后，删除upload下面的文件

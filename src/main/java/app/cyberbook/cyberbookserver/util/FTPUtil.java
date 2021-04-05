@@ -25,15 +25,19 @@ public class FTPUtil {
         this.pwd = pwd;
     }
 
-    public static boolean uploadFile(List<File> fileList, String remotePath) throws IOException {
+    public static boolean uploadFile(
+            List<File> fileList,
+            String remotePath,
+            String imageToDelete
+    ) throws IOException {
         FTPUtil ftpUtil = new FTPUtil(ftpIp, 21, ftpUser, ftpPass);
         logger.info("开始连接 ftp 服务器");
-        boolean result = ftpUtil.uploadFile(remotePath, fileList);
+        boolean result = ftpUtil.uploadFile(remotePath, fileList, imageToDelete);
         logger.info("开始连接 ftp 服务器，结束上传，上传结果：{}", result);
         return result;
     }
 
-    private boolean uploadFile(String remotePath, List<File> fileList) throws IOException {
+    private boolean uploadFile(String remotePath, List<File> fileList, String imageToDelete) throws IOException {
         boolean uploaded = true;
         FileInputStream fis = null;
         // 连接 FTP 服务器
@@ -48,6 +52,10 @@ public class FTPUtil {
                 for (File fileItem : fileList) {
                     fis = new FileInputStream(fileItem);
                     ftpClient.storeFile(fileItem.getName(), fis);
+                }
+
+                if (imageToDelete != null) {
+                    ftpClient.deleteFile(imageToDelete);
                 }
             } catch (IOException e) {
                 uploaded = false;
