@@ -90,7 +90,7 @@ CREATE TABLE `cyberbook_user`
     `gender`            int                  DEFAULT '0' COMMENT '性别：0 - 保密，1 - 男， 2 - 女',
     `birthday`          varchar(50)          DEFAULT NULL COMMENT '生日, MM/DD/YYYY',
     `registered`        bit(1)      NOT NULL DEFAULT b'0' COMMENT '是否已注册',
-    `profile_photo_url` varchar(500)         DEFAULT NULL COMMENT '头像url',
+    `profile_photo`     varchar(500)         DEFAULT NULL COMMENT '头像url',
     `date_registered`   varchar(50) NOT NULL COMMENT '注册日期，使用UTC时间，毫秒值',
     `theme`             varchar(50)          DEFAULT NULL,
     PRIMARY KEY (`id`)

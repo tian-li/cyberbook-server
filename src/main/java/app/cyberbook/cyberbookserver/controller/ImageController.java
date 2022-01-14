@@ -4,6 +4,8 @@ import app.cyberbook.cyberbookserver.model.CyberbookServerResponse;
 import app.cyberbook.cyberbookserver.model.User;
 import app.cyberbook.cyberbookserver.service.FileService;
 import app.cyberbook.cyberbookserver.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(path = "/api/image")
 public class ImageController {
+    private final Logger logger = LoggerFactory.getLogger(ImageController.class);
     @Autowired
     private FileService fileService;
 
@@ -26,6 +29,7 @@ public class ImageController {
     @PostMapping("upload")
     public ResponseEntity<CyberbookServerResponse<String>> upload(
             MultipartFile file,
+            String extensionName,
             String role,
             HttpServletRequest req
     ) {
@@ -43,6 +47,8 @@ public class ImageController {
 
         String tempLocalPath = req.getSession().getServletContext().getRealPath("upload");
 
-        return fileService.upload(file, tempLocalPath, user.getId(), imageToDelete);
+        logger.info("extensionName: {}", extensionName);
+
+        return fileService.upload(file, extensionName, tempLocalPath, user.getId(), imageToDelete);
     }
 }

@@ -4,6 +4,7 @@ import app.cyberbook.cyberbookserver.model.CyberbookServerResponse;
 import app.cyberbook.cyberbookserver.model.Role;
 import app.cyberbook.cyberbookserver.model.User;
 import app.cyberbook.cyberbookserver.model.UserDTO;
+import app.cyberbook.cyberbookserver.service.UserCreationService;
 import app.cyberbook.cyberbookserver.service.UserService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserCreationService userCreationService;
+
     @PostMapping(path = "login-with-token")
     public ResponseEntity<CyberbookServerResponse<UserDTO>> loginWithToken(HttpServletRequest req) {
         return userService.loginWithToken(req);
@@ -27,7 +31,7 @@ public class UserController {
 
     @PostMapping(path = "register-temp-user")
     public ResponseEntity<CyberbookServerResponse<UserDTO>> registerTempUser() {
-        return userService.registerTempUser();
+        return userCreationService.registerTempUser();
     }
 
     @PostMapping(path = "save-temp-user")
@@ -42,12 +46,12 @@ public class UserController {
 
     @PostMapping(path = "register-feedback-manager")
     public ResponseEntity<CyberbookServerResponse<UserDTO>> registerWithRole(@RequestBody User value) {
-        return userService.register(value, Role.ROLE_FEEDBACK_MANAGER);
+        return userCreationService.register(value, Role.ROLE_FEEDBACK_MANAGER);
     }
 
     @PostMapping(path = "register")
     public ResponseEntity<CyberbookServerResponse<UserDTO>> register(@RequestBody User value) {
-        return userService.register(value, Role.ROLE_CLIENT);
+        return userCreationService.register(value, Role.ROLE_CLIENT);
     }
 
     @PostMapping(path = "set-theme")

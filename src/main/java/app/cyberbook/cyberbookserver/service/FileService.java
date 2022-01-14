@@ -11,12 +11,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 public class FileService {
     private final Logger logger = LoggerFactory.getLogger(FileService.class);
 
+    public ResponseEntity<CyberbookServerResponse<String>> upload(
+            MultipartFile file,
+            String extensionName,
+            String tempLocalPath,
+            String remotePath,
+            String imageToDelete
+    ) {
+        return doUpload(file, extensionName, tempLocalPath, remotePath, imageToDelete);
+    }
 
     public ResponseEntity<CyberbookServerResponse<String>> upload(
             MultipartFile file,
@@ -25,14 +33,28 @@ public class FileService {
             String imageToDelete
     ) {
         String fileName = file.getOriginalFilename();
-        // 获取扩展名 abc.jpg -> jpg
-        String fileExtensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
-        String uploadFileName = UUID.randomUUID().toString() + "." + fileExtensionName;
 
-        logger.info("开始上传文件，上文文件的文件名：{}，上传的路径：{}，新文件名：{}", fileName, tempLocalPath, uploadFileName);
+        if(fileName!=null) {
+            String extensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
+            return doUpload(file, extensionName, tempLocalPath, remotePath, imageToDelete);
+        } else {
+            return new ResponseEntity<>(CyberbookServerResponse.failedWithData("上传文件失败"), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private ResponseEntity<CyberbookServerResponse<String>> doUpload(
+            MultipartFile file,
+            String extensionName,
+            String tempLocalPath,
+            String remotePath,
+            String imageToDelete
+
+    ) {
+        String uploadFileName = UUID.randomUUID() + "." + extensionName;
+
+        logger.info("开始上传文件: {}", uploadFileName);
 
         File fileDir = new File(tempLocalPath);
-
         logger.info("fileDir.exists: {}", fileDir.exists());
 
         if (!fileDir.exists()) {

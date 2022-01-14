@@ -17,12 +17,14 @@ public class FTPUtil {
     private static final String ftpIp = PropertiesUtil.getProperty("ftp.server.ip");
     private static final String ftpUser = PropertiesUtil.getProperty("ftp.user");
     private static final String ftpPass = PropertiesUtil.getProperty("ftp.pass");
+    private static final String ftpRootFolder = PropertiesUtil.getProperty("ftp.rootFolder");
 
-    public FTPUtil(String ip, int port, String user, String pwd) {
+    public FTPUtil(String ip, int port, String user, String pwd, String rootFolder) {
         this.ip = ip;
         this.port = port;
         this.user = user;
         this.pwd = pwd;
+        this.rootFolder = rootFolder;
     }
 
     public static boolean uploadFile(
@@ -30,8 +32,8 @@ public class FTPUtil {
             String remotePath,
             String imageToDelete
     ) throws IOException {
-        FTPUtil ftpUtil = new FTPUtil(ftpIp, 21, ftpUser, ftpPass);
-        logger.info("开始连接 ftp 服务器");
+        FTPUtil ftpUtil = new FTPUtil(ftpIp, 21, ftpUser, ftpPass, ftpRootFolder);
+        logger.info("开始连接 ftp 服务器 ip: {}, remotePath:{}， ftpRootFolder: {}", ftpIp, remotePath, ftpRootFolder);
         boolean result = ftpUtil.uploadFile(remotePath, fileList, imageToDelete);
         logger.info("开始连接 ftp 服务器，结束上传，上传结果：{}", result);
         return result;
@@ -43,7 +45,18 @@ public class FTPUtil {
         // 连接 FTP 服务器
         if (connectServer(this.ip, this.port, this.user, this.pwd)) {
             try {
-                ftpClient.makeDirectory(remotePath);
+                ftpClient.changeWorkingDirectory(ftpRootFolder+"/"+remotePath);
+                int returnCode = ftpClient.getReplyCode();
+                if (returnCode == 550) {
+                    logger.info("开始新建文件夹 remotePath: {}", remotePath);
+                    boolean mkdir = ftpClient.makeDirectory(remotePath);
+
+                    if(!mkdir) {
+                        throw new IOException("FTP新建文件夹失败");
+                    }
+                    ftpClient.changeWorkingDirectory(ftpRootFolder);
+                }
+
                 ftpClient.changeWorkingDirectory(remotePath);
                 ftpClient.setBufferSize(1024);
                 ftpClient.setControlEncoding("UTF-8");
@@ -88,6 +101,7 @@ public class FTPUtil {
     private int port;
     private String user;
     private String pwd;
+    private String rootFolder;
     private FTPClient ftpClient;
 
     public String getIp() {
@@ -120,6 +134,14 @@ public class FTPUtil {
 
     public void setPwd(String pwd) {
         this.pwd = pwd;
+    }
+
+    public String getRootFolder() {
+        return rootFolder;
+    }
+
+    public void setRootFolder(String rootFolder) {
+        this.rootFolder = rootFolder;
     }
 
     public FTPClient getFtpClient() {

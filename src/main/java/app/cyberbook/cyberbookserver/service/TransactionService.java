@@ -127,23 +127,23 @@ public class TransactionService {
         }
     }
 
-    public Transaction createTransactionFromSubscription(Subscription subscription, DateTime now) throws RuntimeException {
-        if (subscription.getCategoryId() == null || !categoryService.isCategoryPresent(subscription.getCategoryId())) {
-            throw new RuntimeException("Category does not exist");
-        }
-
-        Transaction transaction = new Transaction();
-
-        transaction.setUserId(subscription.getUserId());
-        transaction.setAmount(subscription.getAmount());
-        transaction.setDescription(subscription.getDescription());
-        transaction.setCategoryId(subscription.getCategoryId());
-        transaction.setSubscriptionId(subscription.getId());
-
-        transaction.setTransactionDate(now.toString(ISOFormat));
-        transaction.setDateCreated(now.toString(ISOFormat));
-        transaction.setDateModified(now.toString(ISOFormat));
-
-        return transaction;
-    }
+//    public Transaction createTransactionFromSubscription(Subscription subscription, DateTime now) throws RuntimeException {
+//        if (subscription.getCategoryId() == null || !categoryService.isCategoryPresent(subscription.getCategoryId())) {
+//            throw new RuntimeException("Category does not exist");
+//        }
+//
+//        Transaction transaction = new Transaction();
+//
+//        transaction.setUserId(subscription.getUserId());
+//        transaction.setAmount(subscription.getAmount());
+//        transaction.setDescription(subscription.getDescription());
+//        transaction.setCategoryId(subscription.getCategoryId());
+//        transaction.setSubscriptionId(subscription.getId());
+//
+//        transaction.setTransactionDate(now.toString(ISOFormat));
+//        transaction.setDateCreated(now.toString(ISOFormat));
+//        transaction.setDateModified(now.toString(ISOFormat));
+//
+//        return transaction;
+//    }
 }

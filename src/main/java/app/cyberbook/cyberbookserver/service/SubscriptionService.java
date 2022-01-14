@@ -21,8 +21,8 @@ public class SubscriptionService {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private TransactionService transactionService;
+//    @Autowired
+//    private TransactionService transactionService;
 
     @Autowired
     TransactionRepository transactionRepository;
@@ -92,7 +92,7 @@ public class SubscriptionService {
 
         // if start date and create date are the same day
         if (startDate.toLocalDate().isEqual(dateCreated.toLocalDate())) {
-            Transaction transaction = transactionService.createTransactionFromSubscription(savedSubscription, startDate);
+            Transaction transaction = createTransactionFromSubscription(savedSubscription, startDate);
             transactionRepository.save(transaction);
 
             savedSubscription = getUpdatedSubscriptionAfterTriggered(savedSubscription, startDate);
@@ -220,5 +220,25 @@ public class SubscriptionService {
 
         subscription.setTotalAmount(updatedTotalAmount);
         return subscription;
+    }
+
+    public Transaction createTransactionFromSubscription(Subscription subscription, DateTime now) throws RuntimeException {
+        if (subscription.getCategoryId() == null || !categoryService.isCategoryPresent(subscription.getCategoryId())) {
+            throw new RuntimeException("Category does not exist");
+        }
+
+        Transaction transaction = new Transaction();
+
+        transaction.setUserId(subscription.getUserId());
+        transaction.setAmount(subscription.getAmount());
+        transaction.setDescription(subscription.getDescription());
+        transaction.setCategoryId(subscription.getCategoryId());
+        transaction.setSubscriptionId(subscription.getId());
+
+        transaction.setTransactionDate(now.toString(ISOFormat));
+        transaction.setDateCreated(now.toString(ISOFormat));
+        transaction.setDateModified(now.toString(ISOFormat));
+
+        return transaction;
     }
 }

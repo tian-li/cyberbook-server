@@ -32,6 +32,11 @@ public class CyberbookServerApplication {
     }
 
     @Bean
+    public UserCreationService userCreationService() {
+        return new UserCreationService();
+    }
+
+    @Bean
     public CategoryService categoryService() {
         return new CategoryService();
     }

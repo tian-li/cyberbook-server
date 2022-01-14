@@ -74,7 +74,7 @@ public class ScheduledTasks {
             DateTime originalNextDate = DateTime.parse(subscription.getNextDate());
 
             if (!originalNextDate.isAfter(now)) {
-                transactionsCreatedFromSubscription.add(transactionService.createTransactionFromSubscription(subscription, now));
+                transactionsCreatedFromSubscription.add(subscriptionService.createTransactionFromSubscription(subscription, now));
 
                 subscription = subscriptionService.getUpdatedSubscriptionAfterTriggered(subscription, now);
                 updatedSubscriptions.add(subscription);
